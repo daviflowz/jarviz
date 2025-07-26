@@ -1,5 +1,5 @@
-import React, { useState, KeyboardEvent, useRef } from 'react';
-import { Send, Loader2, Mic, MicOff } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Send, Mic, MicOff } from 'lucide-react';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -12,167 +12,140 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
   const recognitionRef = useRef<any>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Função para iniciar/parar reconhecimento de voz
-  const handleVoiceInput = () => {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert('Reconhecimento de voz não suportado neste navegador. Use o Chrome para melhor experiência.');
-      return;
-    }
-    if (!recognitionRef.current) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.lang = 'pt-BR';
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.onresult = (event: any) => {
-        // Limpar timeout anterior
+  useEffect(() => {
+    // Verificar se o navegador suporta reconhecimento de voz
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new (window as any).webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'pt-BR';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setMessage(transcript);
+        
+        // Limpar timeout anterior se existir
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
         }
         
-        let finalTranscript = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          }
-        }
-        
-        if (finalTranscript) {
-          setMessage((prev) => prev + (prev ? ' ' : '') + finalTranscript);
-          // Enviar automaticamente após 1 segundo
-          setTimeout(() => {
-            const newMessage = message + (message ? ' ' : '') + finalTranscript;
-            if (newMessage.trim() && !isLoading) {
-              onSendMessage(newMessage.trim());
-              setMessage('');
-            }
-          }, 1000);
-        }
-        
-        // Configurar timeout de 2 segundos para parar
+        // Configurar timeout de 1 segundo para enviar automaticamente
         timeoutRef.current = setTimeout(() => {
-          if (isListening && recognitionRef.current) {
-            recognitionRef.current.stop();
+          if (transcript.trim()) {
+            onSendMessage(transcript);
+            setMessage('');
           }
-        }, 2000);
+        }, 1000);
       };
-      recognitionRef.current.onend = () => {
+
+      recognition.onerror = (event: any) => {
+        console.error('Erro no reconhecimento de voz:', event.error);
         setIsListening(false);
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        // Reiniciar automaticamente se ainda estiver no modo de escuta
-        if (isListening) {
-          setTimeout(() => {
-            if (isListening) {
-              recognitionRef.current.start();
-            }
-          }, 100);
-        }
       };
-      recognitionRef.current.onerror = () => {
+
+      recognition.onend = () => {
         setIsListening(false);
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
       };
+
+      recognitionRef.current = recognition;
     }
-    if (!isListening) {
-      setIsListening(true);
-      recognitionRef.current.start();
-    } else {
-      setIsListening(false);
+
+    return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      recognitionRef.current.stop();
-    }
-  };
+    };
+  }, [onSendMessage]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
-      onSendMessage(message.trim());
+      onSendMessage(message);
       setMessage('');
     }
   };
 
-  const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
+  const toggleListening = () => {
+    if (!recognitionRef.current) return;
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      recognitionRef.current.start();
     }
   };
 
   return (
-    <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
-      <form onSubmit={handleSubmit} className="flex items-end gap-3 max-w-4xl mx-auto">
-        <div className="flex-1 relative">
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Digite sua mensagem..."
-            disabled={isLoading}
-            rows={1}
-            className="input-field resize-none min-h-[48px] max-h-32 pr-20"
-            style={{
-              height: 'auto',
-              minHeight: '48px'
-            }}
-            onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = 'auto';
-              target.style.height = `${Math.min(target.scrollHeight, 128)}px`;
-            }}
-          />
-          {/* Contador de caracteres */}
-          <div className="absolute bottom-2 right-3 text-xs text-gray-400">
-            {message.length}/1000
-          </div>
-          {/* Botão de microfone */}
+    <div className="sticky bottom-0 z-40 glass-effect border-t border-cyan-500/30 p-4">
+      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-3 relative">
+          {/* Botão do microfone - agora no lado esquerdo */}
           <button
             type="button"
-            onClick={handleVoiceInput}
-            disabled={isLoading}
-            className={`absolute top-2 right-12 w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200 ${isListening ? 'bg-red-100 text-red-600' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
-            title={isListening ? 'Parar gravação' : 'Falar'}
+            onClick={toggleListening}
+            disabled={isLoading || !recognitionRef.current}
+            className={`p-3 rounded-lg border transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+              isListening 
+                ? 'bg-red-500/20 border-red-400/50 text-red-400 hover:bg-red-500/30 jarvis-glow' 
+                : 'bg-slate-800/50 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400/50'
+            }`}
+            title={
+              !recognitionRef.current 
+                ? "Reconhecimento de voz não disponível" 
+                : isListening 
+                  ? "Parar gravação" 
+                  : "Iniciar gravação de voz"
+            }
           >
-            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+          </button>
+
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Digite sua mensagem para J.A.R.V.I.S..."
+              disabled={isLoading}
+              className="input-field pr-12 pl-4 text-cyan-100 placeholder-cyan-400/50 bg-slate-800/70 border-cyan-500/30 focus:border-cyan-400 focus:ring-cyan-400/20"
+            />
+            
+            {/* Indicador de carregamento no input */}
+            {isLoading && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="flex gap-1">
+                  <div className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Botão de enviar */}
+          <button
+            type="submit"
+            disabled={!message.trim() || isLoading}
+            className="btn-primary p-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+            title="Enviar mensagem"
+          >
+            <Send size={20} />
           </button>
         </div>
-        <button
-          type="submit"
-          disabled={!message.trim() || isLoading || message.length > 1000}
-          className="btn-primary flex-shrink-0 w-12 h-12 !p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-        >
-          {isLoading ? (
-            <Loader2 size={20} className="animate-spin" />
-          ) : (
-            <Send size={20} />
-          )}
-        </button>
-      </form>
-      {/* Sugestões rápidas */}
-      <div className="flex flex-wrap gap-2 mt-3 max-w-4xl mx-auto">
-        {[
-          "Olá! Como você pode me ajudar?",
-          "Conte-me uma piada",
-          "Explique algo interessante",
-          "Dê-me uma dica útil"
-        ].map((suggestion, index) => (
-          <button
-            key={index}
-            onClick={() => setMessage(suggestion)}
-            disabled={isLoading}
-            className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-full transition-colors duration-200 disabled:opacity-50"
-          >
-            {suggestion}
-          </button>
-        ))}
+        
+        {/* Indicador de voz ativa */}
+        {isListening && (
+          <div className="flex items-center justify-center gap-2 mt-3 text-xs text-red-400">
+            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
+            <span>Ouvindo... Fale agora</span>
+            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
       </div>
+        )}
+      </form>
     </div>
   );
 };

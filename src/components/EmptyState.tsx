@@ -1,90 +1,61 @@
-import React from 'react';
-import { MessageCircle, Sparkles, Heart, Zap } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bot } from 'lucide-react';
 
 interface EmptyStateProps {
   onSuggestedMessage: (message: string) => void;
+  onNavigateToJarvis: () => void;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ onSuggestedMessage }) => {
-  const suggestions = [
-    {
-      icon: <Sparkles size={20} />,
-      title: "Seja criativo",
-      message: "Me conte sobre seus hobbies favoritos",
-      color: "from-purple-400 to-pink-400"
-    },
-    {
-      icon: <Heart size={20} />,
-      title: "Conversas casuais",
-      message: "Como foi seu dia hoje?",
-      color: "from-pink-400 to-red-400"
-    },
-    {
-      icon: <Zap size={20} />,
-      title: "Aprenda algo novo",
-      message: "Explique-me sobre inteligência artificial",
-      color: "from-yellow-400 to-orange-400"
-    }
-  ];
+export const EmptyState: React.FC<EmptyStateProps> = ({ onSuggestedMessage, onNavigateToJarvis }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleLogoClick = () => {
+    setIsAnimating(true);
+    // Após a animação, navegar para a tela do J.A.R.V.I.S
+    setTimeout(() => {
+      onNavigateToJarvis();
+    }, 300);
+  };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-6">
-      <div className="text-center max-w-md mx-auto animate-fade-in">
-        {/* Ícone principal */}
-        <div className="w-24 h-24 bg-gradient-to-br from-pinterest-red to-pinterest-red-dark rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl animate-bounce-subtle">
-          <MessageCircle size={40} className="text-white" />
+    <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden min-h-screen">
+      {/* Efeito de grade tecnológica de fundo */}
+      <div className="absolute inset-0 tech-grid opacity-10" />
+      
+      <div className="text-center relative z-10 flex flex-col items-center justify-center w-full max-w-sm sm:max-w-md md:max-w-lg">
+        {/* Logo principal com efeito suave */}
+        <div className="relative mb-8">
+          {/* Ícone central - responsivo */}
+          <div 
+            className={`w-56 h-56 sm:w-60 sm:h-60 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto jarvis-glow backdrop-blur-sm border border-cyan-400/30 cursor-pointer transition-all duration-300 hover:scale-105 hover:from-cyan-500/30 hover:to-blue-600/30 hover:border-cyan-300/50 ${isAnimating ? 'animate-bounce scale-110' : ''}`}
+            onClick={handleLogoClick}
+            title="Clique para acessar o sistema J.A.R.V.I.S"
+          >
+            <Bot size={100} className="text-cyan-400 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36" />
+          </div>
+          
+          {/* Animação de pulso suave */}
+          <div className="absolute inset-0 rounded-full border border-cyan-400/20 animate-ping pointer-events-none" style={{ animationDuration: '3s' }} />
+          <div className="absolute inset-2 rounded-full border border-blue-400/10 animate-ping pointer-events-none" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+          
+          {/* Círculos orbitais simples */}
+          <div className="absolute inset-0 animate-spin pointer-events-none" style={{ animationDuration: '20s' }}>
+            <div className="absolute top-0 left-1/2 w-2 h-2 bg-cyan-400/60 rounded-full transform -translate-x-1/2 -translate-y-1" />
+          </div>
+          <div className="absolute inset-0 animate-spin pointer-events-none" style={{ animationDuration: '15s', animationDirection: 'reverse' }}>
+            <div className="absolute top-1/2 right-0 w-1.5 h-1.5 bg-blue-400/60 rounded-full transform translate-x-1 -translate-y-1/2" />
+          </div>
         </div>
         
-        {/* Título e descrição */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">
-          Olá! Como posso ajudar?
-        </h2>
-        <p className="text-gray-500 mb-8 leading-relaxed">
-          Comece uma conversa digitando uma mensagem ou escolha uma das sugestões abaixo.
-        </p>
+        {/* Título centralizado */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold hologram-text text-gradient mb-8 sm:mb-12 leading-none">
+          J.A.R.V.I.S
+        </h1>
         
-        {/* Cards de sugestões */}
-        <div className="grid gap-4 mb-6">
-          {suggestions.map((suggestion, index) => (
-            <button
-              key={index}
-              onClick={() => onSuggestedMessage(suggestion.message)}
-              className="group relative overflow-hidden bg-white rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-100 text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 bg-gradient-to-r ${suggestion.color} rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-200`}>
-                  {suggestion.icon}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 group-hover:text-pinterest-red transition-colors duration-200">
-                    {suggestion.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-200">
-                    {suggestion.message}
-                  </p>
-                </div>
-              </div>
-              
-              {/* Efeito de hover */}
-              <div className="absolute inset-0 bg-gradient-to-r from-pinterest-red/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
-          ))}
-        </div>
-        
-        {/* Recursos do app */}
-        <div className="flex justify-center gap-6 text-xs text-gray-400">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Online
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-blue-400 rounded-full" />
-            IA Avançada
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-purple-400 rounded-full" />
-            Seguro
-          </div>
+        {/* Indicador sutil */}
+        <div className="flex items-center gap-2 text-xs text-cyan-400/50">
+          <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+          <span>Sistema Online</span>
         </div>
       </div>
     </div>

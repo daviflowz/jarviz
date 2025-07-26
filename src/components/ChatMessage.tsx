@@ -1,13 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, PauseCircle } from 'lucide-react';
+import { Volume2, PauseCircle, User, Bot } from 'lucide-react';
+import { Message } from '../services/googleAI';
 
 interface ChatMessageProps {
-  message: {
-    id: string;
-    role: 'user' | 'assistant';
-    content: string;
-    timestamp: Date;
-  };
+  message: Message;
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
@@ -60,39 +56,57 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       }
     };
   }, []);
-
+  
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
-      <div className={`max-w-xs lg:max-w-md ${isUser ? 'order-2' : 'order-1'}`}>
-        <div className={`rounded-2xl px-4 py-3 ${
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 animate-slide-up`}>
+      <div className={`flex items-start gap-3 max-w-xs lg:max-w-md ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+        {/* Avatar */}
+      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+        isUser 
+            ? 'bg-gradient-to-br from-cyan-600 to-blue-600 text-white' 
+            : 'glass-effect border border-cyan-500/30 text-cyan-400'
+      }`}>
+        {isUser ? <User size={18} /> : <Bot size={18} />}
+      </div>
+      
+        {/* Mensagem */}
+        <div className="flex flex-col">
+        <div className={`${
           isUser 
             ? 'chat-bubble-user' 
             : 'chat-bubble-ai'
-        }`}>
-          <p className="text-sm leading-relaxed">{message.content}</p>
-          
-          {!isUser && (
-            <button
-              onClick={() => handleSpeak(message.content)}
-              className="mt-2 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
-              title={isPlaying ? "Parar áudio" : "Ouvir mensagem"}
-            >
-              {isPlaying ? (
-                <PauseCircle size={16} className="text-red-600" />
-              ) : (
-                <Volume2 size={16} className="text-gray-600" />
-              )}
-            </button>
-          )}
+          }`}>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+            
+            {/* Botão de áudio para mensagens da IA */}
+            {!isUser && (
+              <button
+                onClick={() => handleSpeak(message.content)}
+                className={`mt-3 p-2 rounded-full transition-all duration-300 ${
+                  isPlaying 
+                    ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+                    : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+                }`}
+                title={isPlaying ? "Parar áudio" : "Ouvir mensagem"}
+              >
+                {isPlaying ? (
+                  <PauseCircle size={16} />
+                ) : (
+                  <Volume2 size={16} />
+                )}
+              </button>
+            )}
         </div>
         
-        <div className={`text-xs text-gray-500 mt-1 ${
-          isUser ? 'text-right' : 'text-left'
-        }`}>
-          {message.timestamp.toLocaleTimeString('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit'
+          {/* Timestamp */}
+          <div className={`text-xs text-cyan-400/60 mt-1 ${
+            isUser ? 'text-right' : 'text-left'
+          }`}>
+          {message.timestamp.toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
           })}
+          </div>
         </div>
       </div>
     </div>

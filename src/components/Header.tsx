@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageCircle, Settings, Trash2 } from 'lucide-react';
+import { Trash2, Settings, Bot } from 'lucide-react';
 
 interface HeaderProps {
   onClearChat: () => void;
@@ -8,41 +8,38 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onClearChat, messageCount }) => {
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
+    <header className="sticky top-0 z-50 glass-effect border-b border-cyan-500/30 px-4 py-3">
       <div className="flex items-center justify-between max-w-4xl mx-auto">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-pinterest-red to-pinterest-red-dark rounded-2xl flex items-center justify-center shadow-lg">
-            <MessageCircle size={20} className="text-white" />
-          </div>
-          
-          <div>
-            <h1 className="text-xl font-bold text-gradient">
-              Chat AI
-            </h1>
-            <p className="text-xs text-gray-500">
-              Powered by Google Gemini
-            </p>
-          </div>
+        {/* Ícone do robô na extrema esquerda */}
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-cyan-400/30">
+          <Bot size={20} className="text-cyan-400" />
         </div>
         
-        <div className="flex items-center gap-2">
+        {/* Conteúdo centralizado */}
+        <div className="text-center">
+          <h1 className="text-xl font-bold hologram-text text-gradient">
+            J A R V I S
+          </h1>
+          <p className="text-xs text-cyan-400/80">
+            Advanced AI Assistant (BETA)
+          </p>
+        </div>
+        
+        {/* Controles à direita */}
+        <div className="flex items-center gap-3">
           {messageCount > 0 && (
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-              {messageCount} mensagens
-            </span>
+            <button
+              onClick={onClearChat}
+              className="p-2 text-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 border border-transparent hover:border-cyan-500/30"
+              title="Limpar conversa"
+            >
+              <Trash2 size={18} />
+            </button>
           )}
           
+          {/* Engrenagem de configurações na extrema direita */}
           <button
-            onClick={onClearChat}
-            disabled={messageCount === 0}
-            className="p-2 text-gray-400 hover:text-pinterest-red hover:bg-pinterest-red/10 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Limpar conversa"
-          >
-            <Trash2 size={18} />
-          </button>
-          
-          <button
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200"
+            className="p-2 text-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 border border-transparent hover:border-cyan-500/30"
             title="Configurações"
           >
             <Settings size={18} />

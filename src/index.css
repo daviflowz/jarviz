@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,50 +13,70 @@
   }
   
   body {
-    @apply font-sans bg-gray-50 text-gray-900 antialiased;
+    @apply font-sans bg-gray-900 text-cyan-100 antialiased;
     margin: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  #root {
+    overflow-x: hidden;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-pinterest-red hover:bg-pinterest-red-dark text-white font-medium py-3 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105;
+    @apply bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-cyan-500/25 transform hover:scale-105;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-2xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md;
+    @apply bg-slate-800/50 hover:bg-slate-700/50 text-cyan-100 font-medium py-3 px-6 rounded-lg border border-cyan-500/30 transition-all duration-300 shadow-sm hover:shadow-cyan-500/20 backdrop-blur-sm;
   }
   
   .input-field {
-    @apply w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-pinterest-red focus:ring-2 focus:ring-pinterest-red/20 outline-none transition-all duration-200 bg-white;
+    @apply w-full px-4 py-3 rounded-lg border border-cyan-500/30 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 outline-none transition-all duration-300 bg-slate-800/50 text-cyan-100 placeholder-cyan-300/50 backdrop-blur-sm;
+    box-shadow: inset 0 0 10px rgba(6, 182, 212, 0.1);
   }
   
   .chat-bubble-user {
-    @apply bg-pinterest-red text-white rounded-2xl rounded-br-md px-4 py-3 max-w-xs ml-auto shadow-lg;
+    @apply bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg rounded-br-sm px-4 py-3 max-w-xs ml-auto shadow-lg;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
   }
   
   .chat-bubble-ai {
-    @apply bg-white text-gray-800 rounded-2xl rounded-bl-md px-4 py-3 max-w-xs shadow-lg border border-gray-100;
+    @apply bg-slate-800/70 text-cyan-100 rounded-lg rounded-bl-sm px-4 py-3 max-w-xs shadow-lg border border-cyan-500/20 backdrop-blur-sm;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
   }
   
-  .masonry-grid {
-    @apply columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4;
+  .jarvis-glow {
+    animation: jarvis-pulse 2s ease-in-out infinite alternate;
   }
   
-  .masonry-item {
-    @apply break-inside-avoid mb-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden;
+  .tech-grid {
+    background-image: 
+      linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .hologram-text {
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-pinterest-red to-pinterest-red-light bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent;
   }
   
   .glass-effect {
-    @apply bg-white/80 backdrop-blur-lg border border-white/20;
+    @apply bg-slate-800/30 backdrop-blur-lg border border-cyan-500/20;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
   }
   
   .scrollbar-hide {
@@ -66,5 +86,133 @@
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+  
+  .animate-bounce-subtle {
+    animation: bounceSubtle 3s ease-in-out infinite;
+  }
+  
+  .animate-screen-enter {
+    animation: screenEnter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: transform, opacity, filter;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .animate-screen-exit {
+    animation: screenExit 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+    will-change: transform, opacity, filter;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes jarvis-pulse {
+  0% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.8), 0 0 40px rgba(6, 182, 212, 0.4);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes screenEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.98);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+@keyframes screenExit {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0) scale(0.98);
+    filter: blur(2px);
+  }
+}
+
+@keyframes matrix-rain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* Efeito de partículas flutuantes */
+.floating-particles::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(2px 2px at 20px 30px, rgba(6, 182, 212, 0.3), transparent),
+                    radial-gradient(2px 2px at 40px 70px, rgba(59, 130, 246, 0.3), transparent),
+                    radial-gradient(1px 1px at 90px 40px, rgba(6, 182, 212, 0.4), transparent),
+                    radial-gradient(1px 1px at 130px 80px, rgba(59, 130, 246, 0.4), transparent);
+  background-repeat: repeat;
+  background-size: 150px 100px;
+  animation: float 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-150px, -100px);
   }
 }
