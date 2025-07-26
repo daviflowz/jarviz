@@ -12,7 +12,7 @@ export interface ChatMessage {
 }
 
 export class GoogleAIService {
-  private model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  private model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   private chatHistory: ChatMessage[] = [];
 
   async sendMessage(message: string): Promise<string> {
