@@ -1,0 +1,15 @@
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCBNtW8gMngS7RpWZeGv0DrWoaCwY_Moig",
+  authDomain: "jarvix-b7e7c.firebaseapp.com",
+  projectId: "jarvix-b7e7c",
+  storageBucket: "jarvix-b7e7c.firebasestorage.app",
+  messagingSenderId: "209861300263",
+  appId: "1:209861300263:web:77fc34d559dd5b8b903e02",
+  measurementId: "G-N77QDXV9ZJ"
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app); 

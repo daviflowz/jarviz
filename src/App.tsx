@@ -1,61 +1,22 @@
-import React, { useState } from 'react';
-import { ChatContainer } from './components/ChatContainer';
-import { JarvisScreen } from './components/JarvisScreen';
+import React, { useEffect, useState } from "react";
+import { FirebaseLogin } from "./components/FirebaseLogin";
+import { auth } from "./firebaseConfig";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { ChatContainer } from "./components/ChatContainer";
 
-type Screen = 'chat' | 'jarvis';
-type TransitionState = 'idle' | 'transitioning';
+const App: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
 
-function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('chat');
-  const [transitionState, setTransitionState] = useState<TransitionState>('idle');
-  const [nextScreen, setNextScreen] = useState<Screen | null>(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, setUser);
+    return () => unsubscribe();
+  }, []);
 
-  const navigateToJarvis = () => {
-    if (transitionState === 'idle') {
-      setTransitionState('transitioning');
-      setNextScreen('jarvis');
-      
-      // Transição contínua da logo
-      setTimeout(() => {
-        setCurrentScreen('jarvis');
-        setTransitionState('idle');
-        setNextScreen(null);
-      }, 500);
-    }
-  };
+  if (!user) {
+    return <FirebaseLogin />;
+  }
 
-  const navigateToChat = () => {
-    if (transitionState === 'idle') {
-      setTransitionState('transitioning');
-      setNextScreen('chat');
-      
-      // Transição contínua da logo
-      setTimeout(() => {
-        setCurrentScreen('chat');
-        setTransitionState('idle');
-        setNextScreen(null);
-      }, 500);
-    }
-  };
-
-  return (
-    <div className="App overflow-hidden">
-      {currentScreen === 'chat' && (
-        <ChatContainer 
-          onNavigateToJarvis={navigateToJarvis}
-          isTransitioning={transitionState === 'transitioning'}
-          nextScreen={nextScreen}
-        />
-      )}
-      {currentScreen === 'jarvis' && (
-        <JarvisScreen 
-          onNavigateToChat={navigateToChat}
-          isTransitioning={transitionState === 'transitioning'}
-          nextScreen={nextScreen}
-        />
-      )}
-    </div>
-  );
-}
+  return <ChatContainer onNavigateToJarvis={() => {}} />;
+};
 
 export default App;
