@@ -23,6 +23,13 @@ export class GoogleAIService {
 
   async sendMessage(message: string): Promise<string> {
     try {
+      // Montar histórico das últimas 20 interações
+      const lastHistory = this.chatHistory.slice(-20);
+      const historyText = lastHistory.map(msg => {
+        const role = msg.role === 'user' ? 'Usuário' : 'Jarvis';
+        return `${role}: ${msg.content}`;
+      }).join('\n');
+
       const prompt = `Você é o Jarvis, um assistente de IA criado por DVFlow. Seja inteligente, útil e amigável, mas mantenha um equilíbrio entre proximidade e profissionalismo.
 
 PERSONALIDADE:
@@ -65,9 +72,7 @@ REGRAS FINAIS:
 - NUNCA use emojis, emoticons ou símbolos especiais
 - Responda sempre com texto simples e natural
 
-Usuário: ${message}
-
-Jarvis:`;
+${historyText ? historyText + '\n' : ''}Usuário: ${message}\n\nJarvis:`;
 
       const result = await this.model.generateContent(prompt);
       const response = await result.response;

@@ -22,20 +22,6 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
   // Referência para controlar todos os áudios ativos
   const activeAudiosRef = useRef<HTMLAudioElement[]>([]);
   
-  // Array de saudações variadas
-  const greetings = useMemo(() => [
-    "Oi! Como posso te ajudar hoje?",
-    "Olá! Estou aqui para conversar com você.",
-    "Oi! Que bom te ver por aqui!",
-    "Olá! Como vai? Em que posso ser útil?",
-    "Oi! Pronto para uma boa conversa?",
-    "Olá! Estou à disposição para te ajudar.",
-    "Oi! Que tal conversarmos um pouco?",
-    "Olá! Como posso te auxiliar hoje?",
-    "Oi! Estou aqui e pronto para conversar!",
-    "Olá! Em que posso te ajudar?"
-  ], []);
-  
   const recognitionRef = useRef<any>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const listeningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -134,55 +120,19 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
         startContinuousConversation();
         
         // Escolher saudação aleatória
-        const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+        // const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
         
         // Falar a saudação após um pequeno delay
         setTimeout(() => {
           if (isActive) {
             setConversationState('speaking');
             
-            googleAIService.textToSpeech(randomGreeting)
-              .then(audioBlob => {
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                
-                // Adicionar à lista de áudios ativos
-                activeAudiosRef.current.push(audio);
-                
-                audio.onended = () => {
-                  URL.revokeObjectURL(audioUrl);
-                  // Remover da lista de áudios ativos
-                  activeAudiosRef.current = activeAudiosRef.current.filter(a => a !== audio);
-                  if (isActive) {
-                    setTimeout(() => {
-                      if (isActive) {
-                        setConversationState('listening');
-                      }
-                    }, 200); // Reduzido de 300ms para 200ms
-                  }
-                };
-                
-                audio.play().catch(error => {
-                  console.error('Erro ao reproduzir saudação:', error);
-                  URL.revokeObjectURL(audioUrl);
-                  // Remover da lista de áudios ativos
-                  activeAudiosRef.current = activeAudiosRef.current.filter(a => a !== audio);
-                  if (isActive) {
-                    setConversationState('listening');
-                  }
-                });
-              })
-              .catch(error => {
-                console.error('Erro no TTS da saudação:', error);
-                if (isActive) {
-                  setConversationState('listening');
-                }
-              });
+            // Remover o trecho que chama googleAIService.textToSpeech("Olá! Estou aqui para conversar com você.") e toda a lógica associada à fala inicial.
           }
         }, 500); // Reduzido de 1000ms para 500ms
       }, 500); // Reduzido de 1000ms para 500ms
     }
-  }, [hasInitialized, greetings, isActive]);
+  }, [hasInitialized, isActive]);
 
   // Inicializar Speech Recognition
   useEffect(() => {

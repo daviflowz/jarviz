@@ -53,6 +53,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [inputFocused, setInputFocused] = useState(false);
 
   // Mudar sugestões apenas quando a página carrega
   useEffect(() => {
@@ -134,7 +135,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       
       <div 
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto scrollbar-hide relative z-10 px-2 sm:px-4 md:px-8"
+        className={`flex-1 overflow-y-auto scrollbar-hide relative z-10 px-2 sm:px-4 md:px-8 ${inputFocused ? 'pb-32' : ''}`}
       >
         {messages.length === 0 ? (
           <EmptyState 
@@ -214,6 +215,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       <ChatInput 
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
+        onInputFocusChange={setInputFocused}
       />
     </div>
   );
