@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebaseConfig";
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, User } from "firebase/auth";
+import { Bot } from "lucide-react";
 
 export const FirebaseLogin: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -27,11 +28,8 @@ export const FirebaseLogin: React.FC = () => {
         {/* Logo estilizada */}
         <div className="mb-8">
           <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto jarvis-glow backdrop-blur-sm border border-cyan-400/30">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-cyan-400">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-              <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2" />
-              <circle cx="12" cy="12" r="2" fill="currentColor" />
-            </svg>
+            {/* Logo Jarvis: Robôzinho */}
+            <Bot size={56} className="text-cyan-400 sm:w-20 sm:h-20 md:w-28 md:h-28" />
           </div>
         </div>
         {/* Título estilizado */}
@@ -42,7 +40,7 @@ export const FirebaseLogin: React.FC = () => {
         {/* Botão de login com Google */}
         <button
           onClick={handleLogin}
-          className="flex items-center gap-3 bg-white text-gray-800 font-semibold px-6 py-3 rounded-lg shadow-lg hover:bg-cyan-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+          className="flex items-center gap-3 bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 border border-cyan-400/40 text-cyan-200 font-semibold px-7 py-3 rounded-xl shadow-lg hover:shadow-cyan-500/30 hover:bg-cyan-900/30 hover:border-cyan-300/70 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 backdrop-blur-sm"
         >
           <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_17_40)">
@@ -57,7 +55,7 @@ export const FirebaseLogin: React.FC = () => {
               </clipPath>
             </defs>
           </svg>
-          Entrar com Google
+          <span className="text-cyan-100 font-bold text-base sm:text-lg tracking-wide drop-shadow">Entrar com Google</span>
         </button>
       </div>
     </div>
