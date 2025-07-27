@@ -5,9 +5,10 @@ interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
   onInputFocusChange?: (focused: boolean) => void;
+  onInputFocusScroll?: () => void;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onInputFocusChange }) => {
+export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onInputFocusChange, onInputFocusScroll }) => {
   const [message, setMessage] = useState('');
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -114,7 +115,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, 
               disabled={isLoading}
               className="input-field pr-12 pl-4 text-cyan-100 placeholder-cyan-400/50 bg-slate-800/70 border-cyan-500/30 focus:border-cyan-400 focus:ring-cyan-400/20 text-base sm:text-lg"
               style={{ minHeight: 44, maxHeight: 80 }}
-              onFocus={() => onInputFocusChange && onInputFocusChange(true)}
+              onFocus={() => {
+                onInputFocusChange && onInputFocusChange(true);
+                setTimeout(() => { onInputFocusScroll && onInputFocusScroll(); }, 100);
+              }}
               onBlur={() => onInputFocusChange && onInputFocusChange(false)}
             />
             
