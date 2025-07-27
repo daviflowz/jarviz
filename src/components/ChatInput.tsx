@@ -109,7 +109,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Digite sua mensagem para J.A.R.V.I.S..."
+              placeholder="Digite sua mensagem..."
               disabled={isLoading}
               className="input-field pr-12 pl-4 text-cyan-100 placeholder-cyan-400/50 bg-slate-800/70 border-cyan-500/30 focus:border-cyan-400 focus:ring-cyan-400/20"
             />

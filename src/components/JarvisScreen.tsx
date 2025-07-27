@@ -4,13 +4,37 @@ import { googleAIService } from '../services/googleAI';
 
 interface JarvisScreenProps {
   onNavigateToChat: () => void;
+  isTransitioning?: boolean;
+  nextScreen?: 'chat' | 'jarvis' | null;
 }
 
 type ConversationState = 'idle' | 'listening' | 'processing' | 'speaking';
 
-export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) => {
+export const JarvisScreen: React.FC<JarvisScreenProps> = ({ 
+  onNavigateToChat, 
+  isTransitioning = false, 
+  nextScreen = null 
+}) => {
   const [conversationState, setConversationState] = useState<ConversationState>('idle');
   const [isActive, setIsActive] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  
+  // Referência para controlar todos os áudios ativos
+  const activeAudiosRef = useRef<HTMLAudioElement[]>([]);
+  
+  // Array de saudações variadas
+  const greetings = [
+    "Oi! Como posso te ajudar hoje?",
+    "Olá! Estou aqui para conversar com você.",
+    "Oi! Que bom te ver por aqui!",
+    "Olá! Como vai? Em que posso ser útil?",
+    "Oi! Pronto para uma boa conversa?",
+    "Olá! Estou à disposição para te ajudar.",
+    "Oi! Que tal conversarmos um pouco?",
+    "Olá! Como posso te auxiliar hoje?",
+    "Oi! Estou aqui e pronto para conversar!",
+    "Olá! Em que posso te ajudar?"
+  ];
   
   const recognitionRef = useRef<any>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -22,24 +46,17 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
       clearTimeout(listeningTimeoutRef.current);
     }
     
-    // Iniciar timeout de 6 segundos quando começar a ouvir
+    // Iniciar timeout de 10 segundos quando começar a ouvir
     listeningTimeoutRef.current = setTimeout(() => {
       if (isActive && conversationState === 'listening') {
-        console.log('Timeout: Nenhuma voz detectada em 6 segundos, encerrando conversa');
-        setIsActive(false);
-        setConversationState('idle');
+        console.log('Timeout: Nenhuma voz detectada em 10 segundos, encerrando conversa');
         
-        // Parar reconhecimento
-        if (recognitionRef.current) {
-          try {
-            recognitionRef.current.stop();
-            recognitionRef.current.abort();
-          } catch (error) {
-            console.error('Erro ao parar reconhecimento:', error);
-          }
-        }
+        // Usar a mesma função de parada completa
+        stopContinuousConversation();
+        
+        console.log('Sistema completamente parado por timeout');
       }
-    }, 6000);
+    }, 10000);
   };
 
   const clearListeningTimeout = () => {
@@ -72,72 +89,148 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
     };
   }, []);
 
+  // Inicializar automaticamente quando o componente montar
+  useEffect(() => {
+    if (!hasInitialized) {
+      setHasInitialized(true);
+      
+      // Pequeno delay para garantir que tudo está carregado
+      setTimeout(() => {
+        // Iniciar conversa primeiro
+        startContinuousConversation();
+        
+        // Escolher saudação aleatória
+        const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+        
+        // Falar a saudação após um pequeno delay
+        setTimeout(() => {
+          if (isActive) {
+            setConversationState('speaking');
+            
+            googleAIService.textToSpeech(randomGreeting)
+              .then(audioBlob => {
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                // Adicionar à lista de áudios ativos
+                activeAudiosRef.current.push(audio);
+                
+                audio.onended = () => {
+                  URL.revokeObjectURL(audioUrl);
+                  // Remover da lista de áudios ativos
+                  activeAudiosRef.current = activeAudiosRef.current.filter(a => a !== audio);
+                  if (isActive) {
+                    setTimeout(() => {
+                      if (isActive) {
+                        setConversationState('listening');
+                      }
+                    }, 300);
+                  }
+                };
+                
+                audio.play().catch(error => {
+                  console.error('Erro ao reproduzir saudação:', error);
+                  URL.revokeObjectURL(audioUrl);
+                  // Remover da lista de áudios ativos
+                  activeAudiosRef.current = activeAudiosRef.current.filter(a => a !== audio);
+                  if (isActive) {
+                    setConversationState('listening');
+                  }
+                });
+              })
+              .catch(error => {
+                console.error('Erro no TTS da saudação:', error);
+                if (isActive) {
+                  setConversationState('listening');
+                }
+              });
+          }
+        }, 1000);
+      }, 1000);
+    }
+  }, [hasInitialized]);
+
   // Inicializar Speech Recognition
   useEffect(() => {
-    const speakResponse = (text: string) => {
-      if (isActive) {
-        // Garantir que paramos qualquer reconhecimento antes de falar
-        if (recognitionRef.current) {
-          try {
-            recognitionRef.current.stop();
-          } catch (error) {
-            // Ignorar erros
+          const speakResponse = (text: string) => {
+        if (isActive) {
+          // Verificar novamente se ainda está ativo antes de falar
+          if (!isActive) {
+            console.log('Sistema não está mais ativo, cancelando fala');
+            return;
           }
-        }
+          
+          // Garantir que paramos qualquer reconhecimento antes de falar
+          if (recognitionRef.current) {
+            try {
+              recognitionRef.current.stop();
+            } catch (error) {
+              // Ignorar erros
+            }
+          }
 
-        setConversationState('speaking');
+          setConversationState('speaking');
         
         // Parar qualquer fala anterior do navegador
         if (window.speechSynthesis) {
           window.speechSynthesis.cancel();
         }
         
-        // Usar Google Cloud Text-to-Speech com voz Neural2-B
-        googleAIService.textToSpeech(text)
-          .then(audioBlob => {
-            if (isActive) {
-              // Criar URL do blob de áudio (igual ao ChatMessage)
-              const audioUrl = URL.createObjectURL(audioBlob);
-              const audio = new Audio(audioUrl);
-              
-              audio.onended = () => {
-                URL.revokeObjectURL(audioUrl); // Limpar memória
-                if (isActive) {
-                  // Reduzir tempo de espera para volta mais rápida
-                  setTimeout(() => {
-                    if (isActive) {
-                      setConversationState('listening');
-                    }
-                  }, 300); // Reduzido de 800ms para 300ms
-                }
-              };
-              
-              audio.onerror = () => {
-                URL.revokeObjectURL(audioUrl);
-                console.error('Erro ao reproduzir áudio');
-                if (isActive) {
-                  setTimeout(() => {
-                    if (isActive) {
-                      setConversationState('listening');
-                    }
-                  }, 300); // Reduzido de 800ms para 300ms
-                }
-              };
-              
-              // Iniciar reprodução imediatamente
-              audio.play().catch(error => {
-                console.error('Erro ao iniciar reprodução:', error);
-                URL.revokeObjectURL(audioUrl);
-                if (isActive) {
-                  setTimeout(() => {
-                    if (isActive) {
-                      setConversationState('listening');
-                    }
-                  }, 300); // Reduzido de 800ms para 300ms
-                }
-              });
-            }
-          })
+                  // Usar Google Cloud Text-to-Speech com voz Neural2-B
+          googleAIService.textToSpeech(text)
+            .then(audioBlob => {
+              if (isActive) {
+                // Criar URL do blob de áudio (igual ao ChatMessage)
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                // Adicionar à lista de áudios ativos
+                activeAudiosRef.current.push(audio);
+                
+                audio.onended = () => {
+                  URL.revokeObjectURL(audioUrl); // Limpar memória
+                  // Remover da lista de áudios ativos
+                  activeAudiosRef.current = activeAudiosRef.current.filter(a => a !== audio);
+                  if (isActive) {
+                    // Reduzir tempo de espera para volta mais rápida
+                    setTimeout(() => {
+                      if (isActive) {
+                        setConversationState('listening');
+                      }
+                    }, 300); // Reduzido de 800ms para 300ms
+                  }
+                };
+                
+                audio.onerror = () => {
+                  URL.revokeObjectURL(audioUrl);
+                  // Remover da lista de áudios ativos
+                  activeAudiosRef.current = activeAudiosRef.current.filter(a => a !== audio);
+                  console.error('Erro ao reproduzir áudio');
+                  if (isActive) {
+                    setTimeout(() => {
+                      if (isActive) {
+                        setConversationState('listening');
+                      }
+                    }, 300); // Reduzido de 800ms para 300ms
+                  }
+                };
+                
+                // Iniciar reprodução imediatamente
+                audio.play().catch(error => {
+                  console.error('Erro ao iniciar reprodução:', error);
+                  URL.revokeObjectURL(audioUrl);
+                  // Remover da lista de áudios ativos
+                  activeAudiosRef.current = activeAudiosRef.current.filter(a => a !== audio);
+                  if (isActive) {
+                    setTimeout(() => {
+                      if (isActive) {
+                        setConversationState('listening');
+                      }
+                    }, 300); // Reduzido de 800ms para 300ms
+                  }
+                });
+              }
+            })
           .catch(error => {
             console.error('Erro no TTS:', error);
             // Fallback para voz do navegador em caso de erro
@@ -232,7 +325,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
       recognition.onstart = () => {
         // Só atualizar estado se realmente deveria estar ouvindo
         if (isActive && conversationState === 'listening') {
-          console.log('Reconhecimento iniciado - timeout de 6s ativo');
+          console.log('Reconhecimento iniciado - timeout de 10s ativo');
         }
       };
 
@@ -242,6 +335,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
           clearListeningTimeout();
           
           const transcript = event.results[0][0].transcript;
+          console.log('Voz detectada:', transcript);
           handleUserSpeech(transcript);
         }
       };
@@ -258,9 +352,9 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
       };
 
       recognition.onend = () => {
-        // Reiniciar mais rapidamente se estiver ativo
+        // Só reiniciar se estiver ativo E no estado listening
         if (isActive && conversationState === 'listening') {
-          setTimeout(() => startListening(), 200); // Reduzido de 500ms
+          setTimeout(() => startListening(), 200);
         } else {
           // Limpar timeout se não for reiniciar
           clearListeningTimeout();
@@ -271,8 +365,8 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
     }
 
     // Iniciar listening apenas quando o estado mudar para 'listening'
-    if (conversationState === 'listening') {
-      const timer = setTimeout(() => startListening(), 100);
+    if (conversationState === 'listening' && isActive) {
+      const timer = setTimeout(() => startListening(), 200);
       return () => clearTimeout(timer);
     }
 
@@ -293,6 +387,8 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
   };
 
   const stopContinuousConversation = () => {
+    console.log('Parando conversa manualmente...');
+    
     // Primeiro, definir como inativo para parar todos os ciclos
     setIsActive(false);
     setConversationState('idle');
@@ -307,8 +403,11 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
       }
     }
     
-    // Parar síntese de voz
+    // Parar síntese de voz IMEDIATAMENTE
     if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
       window.speechSynthesis.cancel();
     }
     
@@ -319,8 +418,49 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
     }
     clearListeningTimeout(); // Limpar timeout de ouvir
     
-    // Limpar estados
-    // (estados já foram removidos)
+    // Forçar parada IMEDIATA de qualquer áudio em reprodução
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = '';
+      audio.load(); // Força recarregamento
+    });
+    
+    // Parar qualquer fala em andamento do TTS
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    
+    // Parar TODOS os áudios ativos controlados pelo sistema
+    activeAudiosRef.current.forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = '';
+    });
+    activeAudiosRef.current = []; // Limpar lista
+    
+    // Forçar parada de qualquer elemento de áudio criado pelo TTS
+    const allAudios = document.querySelectorAll('audio');
+    allAudios.forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = '';
+      audio.load(); // Força recarregamento
+    });
+    
+    // Parar TODOS os elementos de áudio da página
+    const allAudioElements = document.querySelectorAll('audio, video');
+    allAudioElements.forEach(element => {
+      if (element instanceof HTMLAudioElement || element instanceof HTMLVideoElement) {
+        element.pause();
+        element.currentTime = 0;
+        element.src = '';
+        element.load();
+      }
+    });
+    
+    console.log('Conversa parada manualmente');
   };
 
   const getStateText = () => {
@@ -350,12 +490,26 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
   };
 
   const handleBackNavigation = () => {
-    // Se estiver em conversa ativa, encerrar primeiro
-    if (isActive) {
-      stopContinuousConversation();
-    }
-    // Navegar de volta ao chat
-    onNavigateToChat();
+    console.log('Navegando de volta...');
+    
+    // Parar TUDO imediatamente
+    stopContinuousConversation();
+    
+    // Forçar parada adicional de áudio
+    setTimeout(() => {
+      // Parar novamente para garantir
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      const audios = document.querySelectorAll('audio');
+      audios.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = '';
+      });
+      
+      onNavigateToChat();
+    }, 200);
   };
 
   return (
@@ -437,10 +591,12 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({ onNavigateToChat }) 
           {isActive && (
             <>
               <div className="w-px h-4 bg-cyan-400/30" />
-              <span className="text-cyan-400/40">Timeout: 6s</span>
+              <span className="text-cyan-400/40">Timeout: 10s</span>
             </>
           )}
         </div>
+        
+
       </div>
     </div>
   );

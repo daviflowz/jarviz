@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ChatContainer } from './components/ChatContainer';
 import { JarvisScreen } from './components/JarvisScreen';
 
 type Screen = 'chat' | 'jarvis';
-type TransitionState = 'idle' | 'exiting' | 'entering';
+type TransitionState = 'idle' | 'transitioning';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('chat');
@@ -12,60 +12,48 @@ function App() {
 
   const navigateToJarvis = () => {
     if (transitionState === 'idle') {
-      setTransitionState('exiting');
+      setTransitionState('transitioning');
       setNextScreen('jarvis');
+      
+      // Transição contínua da logo
+      setTimeout(() => {
+        setCurrentScreen('jarvis');
+        setTransitionState('idle');
+        setNextScreen(null);
+      }, 500);
     }
   };
 
   const navigateToChat = () => {
     if (transitionState === 'idle') {
-      setTransitionState('exiting');
+      setTransitionState('transitioning');
       setNextScreen('chat');
-    }
-  };
-
-  useEffect(() => {
-    if (transitionState === 'exiting' && nextScreen) {
-      const timer = setTimeout(() => {
-        setCurrentScreen(nextScreen);
-        setTransitionState('entering');
-        setNextScreen(null);
-      }, 300); // Duração sincronizada com CSS
-
-      return () => clearTimeout(timer);
-    } else if (transitionState === 'entering') {
-      const timer = setTimeout(() => {
+      
+      // Transição contínua da logo
+      setTimeout(() => {
+        setCurrentScreen('chat');
         setTransitionState('idle');
-      }, 300); // Duração sincronizada com CSS
-
-      return () => clearTimeout(timer);
-    }
-  }, [transitionState, nextScreen]);
-
-  const getScreenClasses = () => {
-    const baseClasses = "transition-all duration-300 ease-in-out min-h-screen";
-    
-    switch (transitionState) {
-      case 'exiting':
-        return `${baseClasses} animate-screen-exit`;
-      case 'entering':
-        return `${baseClasses} animate-screen-enter`;
-      case 'idle':
-      default:
-        return `${baseClasses} opacity-100 scale-100 transform translate-y-0`;
+        setNextScreen(null);
+      }, 500);
     }
   };
 
   return (
-    <div className="App overflow-x-hidden">
-      <div className={getScreenClasses()}>
-        {currentScreen === 'chat' && (
-          <ChatContainer onNavigateToJarvis={navigateToJarvis} />
-        )}
-        {currentScreen === 'jarvis' && (
-          <JarvisScreen onNavigateToChat={navigateToChat} />
-        )}
-      </div>
+    <div className="App overflow-hidden">
+      {currentScreen === 'chat' && (
+        <ChatContainer 
+          onNavigateToJarvis={navigateToJarvis}
+          isTransitioning={transitionState === 'transitioning'}
+          nextScreen={nextScreen}
+        />
+      )}
+      {currentScreen === 'jarvis' && (
+        <JarvisScreen 
+          onNavigateToChat={navigateToChat}
+          isTransitioning={transitionState === 'transitioning'}
+          nextScreen={nextScreen}
+        />
+      )}
     </div>
   );
 }

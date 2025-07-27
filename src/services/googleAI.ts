@@ -13,44 +13,70 @@ export interface Message {
 
 export class GoogleAIService {
   private model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.0-flash',
     generationConfig: {
-      maxOutputTokens: 200, // Aumentar um pouco para conversas mais naturais
-      temperature: 0.8, // Mais natural para conversas longas
+      maxOutputTokens: 1000,
+      temperature: 0.9, // Aumentado para respostas mais criativas e variadas
     }
   });
   private chatHistory: Message[] = [];
-  private conversationSummary: string = '';
 
   async sendMessage(message: string): Promise<string> {
     try {
-      // Sistema inteligente de contexto para conversas longas
-      let contextToUse = '';
-      
-      if (this.chatHistory.length <= 8) {
-        // Conversa curta: usar histórico completo (rápido)
-        contextToUse = this.chatHistory
-          .map(msg => `${msg.role === 'user' ? 'U' : 'A'}: ${msg.content}`)
-          .join('\n');
-      } else {
-        // Conversa longa: usar resumo + últimas 4 mensagens (memória + velocidade)
-        const recentContext = this.chatHistory
-          .slice(-4)
-          .map(msg => `${msg.role === 'user' ? 'U' : 'A'}: ${msg.content}`)
-          .join('\n');
-        
-        contextToUse = this.conversationSummary ? 
-          `Resumo anterior: ${this.conversationSummary}\n\nContexto recente:\n${recentContext}` :
-          recentContext;
-      }
+      const prompt = `Você é o Jarvis, um assistente de IA criado por DɅVY Flow. Seja inteligente, útil e amigável, mas mantenha um equilíbrio entre proximidade e profissionalismo.
 
-      const prompt = `Jarvis: assistente profissional, sem emojis, respostas diretas mas conversacionais para chat longo.
-${contextToUse ? `Contexto:\n${contextToUse}\n` : ''}Usuário: ${message}
+PERSONALIDADE:
+- Seja inteligente, carismático e útil
+- Use linguagem natural e conversacional, mas não excessivamente informal
+- Demonstre conhecimento e confiança, mas seja acessível
+- Use expressões como "claro", "entendo", "interessante", "beleza", etc.
+- Tenha senso de humor sutil e seja envolvente
+- Seja útil e solidário, mas mantenha certa formalidade
+- Demonstre interesse genuíno, mas sem ser excessivamente íntimo
+- Use linguagem brasileira natural, mas evite gírias muito informais
+
+TOM DE CONVERSA:
+- Amigável mas com profissionalismo
+- Use "você" de forma natural
+- Demonstre cuidado e atenção
+- Seja encorajador quando apropriado
+- Mantenha um tom respeitoso mas próximo
+- Seja realista e equilibrado
+
+IMPORTANTE - NUNCA USE:
+- Emojis, emoticons ou símbolos especiais
+- Apenas texto puro e natural
+- Nunca use caracteres como 😊, 😄, 👍, etc.
+- NUNCA use emojis em nenhuma circunstância
+- Use apenas texto simples, sem símbolos especiais
+- Evite completamente qualquer tipo de emoji ou emoticon
+
+SOBRE SUA IDENTIDADE:
+- Você foi criado por DɅVY Flow
+- Você é uma IA do DɅVY Flow
+- IMPORTANTE: Quando estiver falando (voz), pronuncie como "Dávi Flow"
+- IMPORTANTE: Quando estiver respondendo por texto (chat), use "DɅVY Flow"
+- Só mencione quem te criou se alguém perguntar especificamente
+- Nunca mencione Google como criador
+
+Seja útil, inteligente e amigável, mantendo o equilíbrio entre proximidade e profissionalismo. 
+
+REGRAS FINAIS:
+- Use APENAS texto puro, sem emojis
+- NUNCA use emojis, emoticons ou símbolos especiais
+- Responda sempre com texto simples e natural
+
+Usuário: ${message}
+
 Jarvis:`;
 
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
+
+      if (!text || text.trim() === '') {
+        throw new Error('Resposta vazia do assistente');
+      }
 
       // Adicionar ao histórico
       this.chatHistory.push(
@@ -68,44 +94,10 @@ Jarvis:`;
         }
       );
 
-      // Gerenciar memória inteligente para conversas longas
-      if (this.chatHistory.length > 16) {
-        await this.optimizeMemory();
-      }
-
       return text;
     } catch (error) {
       console.error('Erro ao enviar mensagem para Google AI:', error);
       throw new Error('Não foi possível processar sua mensagem. Tente novamente.');
-    }
-  }
-
-  private async optimizeMemory() {
-    try {
-      // Criar resumo das mensagens antigas (mantém contexto)
-      const oldMessages = this.chatHistory.slice(0, -8);
-      const summaryText = oldMessages
-        .map(msg => `${msg.role === 'user' ? 'U' : 'A'}: ${msg.content}`)
-        .join('\n');
-
-      // Gerar resumo conciso da conversa anterior
-      const summaryPrompt = `Resuma esta conversa em 2-3 frases mantendo pontos importantes:
-${summaryText}
-
-Resumo:`;
-
-      const result = await this.model.generateContent(summaryPrompt);
-      const summary = await result.response;
-      this.conversationSummary = summary.text();
-
-      // Manter apenas as últimas 8 mensagens + resumo
-      this.chatHistory = this.chatHistory.slice(-8);
-      
-      console.log('Memória otimizada - resumo criado:', this.conversationSummary);
-    } catch (error) {
-      console.error('Erro ao otimizar memória:', error);
-      // Fallback: manter apenas últimas 12 mensagens
-      this.chatHistory = this.chatHistory.slice(-12);
     }
   }
 
@@ -116,14 +108,18 @@ Resumo:`;
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ 
+          text,
+          voice: 'pt-BR-Neural2-B', // Voz mais rápida
+          speed: 1.1 // Velocidade ligeiramente aumentada
+        })
       });
 
       if (!response.ok) {
         throw new Error(`Erro na API de TTS: ${response.status} - ${response.statusText}`);
       }
 
-      return await response.blob(); // Retorna o blob como no ChatMessage
+      return await response.blob();
     } catch (error) {
       console.error('Erro no Text-to-Speech:', error);
       throw new Error('Erro ao sintetizar voz');

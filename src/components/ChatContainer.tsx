@@ -8,9 +8,15 @@ import { AlertTriangle } from 'lucide-react';
 
 interface ChatContainerProps {
   onNavigateToJarvis: () => void;
+  isTransitioning?: boolean;
+  nextScreen?: 'chat' | 'jarvis' | null;
 }
 
-export const ChatContainer: React.FC<ChatContainerProps> = ({ onNavigateToJarvis }) => {
+export const ChatContainer: React.FC<ChatContainerProps> = ({ 
+  onNavigateToJarvis, 
+  isTransitioning = false, 
+  nextScreen = null 
+}) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,6 +104,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ onNavigateToJarvis
           <EmptyState 
             onSuggestedMessage={handleSuggestedMessage}
             onNavigateToJarvis={onNavigateToJarvis}
+            isTransitioning={isTransitioning}
+            nextScreen={nextScreen}
           />
         ) : (
           <div className="max-w-4xl mx-auto p-4 space-y-4">

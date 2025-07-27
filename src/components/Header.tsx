@@ -27,7 +27,8 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, messageCount }) => 
         
         {/* Controles à direita */}
         <div className="flex items-center gap-3">
-          {messageCount > 0 && (
+          {messageCount > 0 ? (
+            // Quando há mensagens: mostrar lixeira
             <button
               onClick={onClearChat}
               className="p-2 text-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 border border-transparent hover:border-cyan-500/30"
@@ -35,15 +36,15 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, messageCount }) => 
             >
               <Trash2 size={18} />
             </button>
+          ) : (
+            // Quando não há mensagens: mostrar engrenagem
+            <button
+              className="p-2 text-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 border border-transparent hover:border-cyan-500/30"
+              title="Configurações"
+            >
+              <Settings size={18} />
+            </button>
           )}
-          
-          {/* Engrenagem de configurações na extrema direita */}
-          <button
-            className="p-2 text-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 border border-transparent hover:border-cyan-500/30"
-            title="Configurações"
-          >
-            <Settings size={18} />
-          </button>
         </div>
       </div>
     </header>

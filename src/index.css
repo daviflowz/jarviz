@@ -111,6 +111,124 @@
     will-change: transform, opacity, filter;
     transform: translate3d(0, 0, 0);
   }
+  
+  /* Novas animações tecnológicas */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-jarvis-activation {
+    animation: jarvisActivation 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  }
+  
+  .animate-bot-activation {
+    animation: botActivation 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  }
+  
+  .animate-energy-pulse {
+    animation: energyPulse 0.8s ease-in-out infinite;
+  }
+  
+  .animate-energy-burst {
+    animation: energyBurst 0.8s ease-out forwards;
+  }
+  
+  .animate-energy-ring {
+    animation: energyRing 0.8s ease-out infinite;
+  }
+  
+  .animate-title-activation {
+    animation: titleActivation 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  }
+  
+  .animate-status-activation {
+    animation: statusActivation 0.8s ease-out forwards;
+  }
+  
+  .animate-pulse-fast {
+    animation: pulseFast 0.5s ease-in-out infinite;
+  }
+  
+  /* Animações de transição avançadas */
+  .animate-screen-enter-advanced {
+    animation: screenEnterAdvanced 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: transform, opacity, filter;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .animate-screen-exit-advanced {
+    animation: screenExitAdvanced 0.6s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+    will-change: transform, opacity, filter;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .transition-particles {
+    background-image: 
+      radial-gradient(1px 1px at 20px 30px, rgba(6, 182, 212, 0.8), transparent),
+      radial-gradient(1px 1px at 40px 70px, rgba(59, 130, 246, 0.8), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(6, 182, 212, 0.6), transparent),
+      radial-gradient(1px 1px at 130px 80px, rgba(59, 130, 246, 0.6), transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: transitionParticles 0.6s ease-out forwards;
+  }
+  
+  /* Animações simplificadas para melhor performance */
+  .animate-float-simple {
+    animation: floatSimple 8s ease-in-out infinite;
+  }
+  
+  .animate-jarvis-simple {
+    animation: jarvisSimple 0.5s ease-out forwards;
+  }
+  
+  .animate-bot-simple {
+    animation: botSimple 0.5s ease-out forwards;
+  }
+  
+  .animate-title-simple {
+    animation: titleSimple 0.5s ease-out forwards;
+  }
+  
+  .animate-status-simple {
+    animation: statusSimple 0.5s ease-out forwards;
+  }
+  
+  /* Transição suave entre telas */
+  .animate-smooth-transition {
+    animation: smoothTransition 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  /* Transição 3D da logo */
+  .animate-logo-3d-transition {
+    animation: logo3DTransition 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  /* Animações específicas da logo */
+  .animate-logo-move-to-jarvis {
+    animation: logoMoveToJarvis 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  .animate-bot-move {
+    animation: botMove 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  .animate-title-fade {
+    animation: titleFade 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  .animate-status-fade {
+    animation: statusFade 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  /* Animações de transformação da logo */
+  .animate-logo-transform-to-jarvis {
+    animation: logoTransformToJarvis 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  
+  .animate-title-transform-to-jarvis {
+    animation: titleTransformToJarvis 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
 }
 
 @keyframes jarvis-pulse {
@@ -179,6 +297,424 @@
   }
 }
 
+/* Novas animações tecnológicas */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-5px) translateX(-5px);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateY(-15px) translateX(3px);
+    opacity: 0.9;
+  }
+}
+
+@keyframes jarvisActivation {
+  0% {
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+  }
+  25% {
+    transform: scale(1.1) rotate(3deg);
+    box-shadow: 0 0 40px rgba(6, 182, 212, 0.8);
+  }
+  50% {
+    transform: scale(1.15) rotate(6deg);
+    box-shadow: 0 0 60px rgba(6, 182, 212, 1), 0 0 80px rgba(59, 130, 246, 0.6);
+  }
+  75% {
+    transform: scale(1.1) rotate(9deg);
+    box-shadow: 0 0 50px rgba(6, 182, 212, 0.9);
+  }
+  100% {
+    transform: scale(1.1) rotate(12deg);
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.8);
+  }
+}
+
+@keyframes botActivation {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.1) rotate(5deg);
+    filter: brightness(1.2) hue-rotate(10deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+    filter: brightness(1.5) hue-rotate(20deg);
+  }
+  75% {
+    transform: scale(1.15) rotate(8deg);
+    filter: brightness(1.3) hue-rotate(15deg);
+  }
+  100% {
+    transform: scale(1.1) rotate(5deg);
+    filter: brightness(1.1) hue-rotate(5deg);
+  }
+}
+
+@keyframes energyPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes energyBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes energyRing {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes titleActivation {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.3) hue-rotate(5deg);
+  }
+  75% {
+    transform: scale(1.08);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes statusActivation {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseFast {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Animações de transição avançadas */
+@keyframes screenEnterAdvanced {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0) scale(0.95) rotateX(5deg);
+    filter: blur(3px) brightness(0.8);
+  }
+  25% {
+    opacity: 0.3;
+    transform: translate3d(0, 15px, 0) scale(0.97) rotateX(2deg);
+    filter: blur(2px) brightness(0.9);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate3d(0, 5px, 0) scale(0.99) rotateX(1deg);
+    filter: blur(1px) brightness(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotateX(0deg);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+@keyframes screenExitAdvanced {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotateX(0deg);
+    filter: blur(0px) brightness(1);
+  }
+  25% {
+    opacity: 0.8;
+    transform: translate3d(0, -10px, 0) scale(0.98) rotateX(-2deg);
+    filter: blur(1px) brightness(0.95);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate3d(0, -20px, 0) scale(0.96) rotateX(-3deg);
+    filter: blur(2px) brightness(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -30px, 0) scale(0.94) rotateX(-5deg);
+    filter: blur(3px) brightness(0.8);
+  }
+}
+
+@keyframes transitionParticles {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Animações simplificadas */
+@keyframes floatSimple {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-15px);
+    opacity: 0.8;
+  }
+}
+
+@keyframes jarvisSimple {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+  }
+  100% {
+    transform: scale(1.1);
+    box-shadow: 0 0 40px rgba(6, 182, 212, 0.8);
+  }
+}
+
+@keyframes botSimple {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes titleSimple {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes statusSimple {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Transição suave entre telas */
+@keyframes smoothTransition {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Transição 3D da logo */
+@keyframes logo3DTransition {
+  0% {
+    opacity: 1;
+    transform: perspective(1000px) translateZ(0) scale(1) rotateX(0deg) rotateY(0deg);
+  }
+  25% {
+    opacity: 0.8;
+    transform: perspective(1000px) translateZ(100px) scale(1.1) rotateX(5deg) rotateY(0deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: perspective(1000px) translateZ(200px) scale(1.2) rotateX(10deg) rotateY(5deg);
+  }
+  75% {
+    opacity: 0.8;
+    transform: perspective(1000px) translateZ(100px) scale(1.1) rotateX(5deg) rotateY(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) translateZ(0) scale(1) rotateX(0deg) rotateY(0deg);
+  }
+}
+
+/* Animações específicas da logo */
+@keyframes logoMoveToJarvis {
+  0% {
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+  }
+  25% {
+    transform: scale(1.05) rotate(2deg);
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.6);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 40px rgba(6, 182, 212, 0.8);
+  }
+  75% {
+    transform: scale(1.15) rotate(8deg);
+    box-shadow: 0 0 50px rgba(6, 182, 212, 1);
+  }
+  100% {
+    transform: scale(1.2) rotate(10deg);
+    box-shadow: 0 0 60px rgba(6, 182, 212, 1);
+  }
+}
+
+@keyframes botMove {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.05) rotate(2deg);
+    filter: brightness(1.1);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    filter: brightness(1.2);
+  }
+  75% {
+    transform: scale(1.15) rotate(8deg);
+    filter: brightness(1.3);
+  }
+  100% {
+    transform: scale(1.2) rotate(10deg);
+    filter: brightness(1.4);
+  }
+}
+
+@keyframes titleFade {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes statusFade {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* Animações de transformação da logo */
+@keyframes logoTransformToJarvis {
+  0% {
+    transform: scale(1);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
+  }
+  50% {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3));
+  }
+  100% {
+    transform: scale(1.2);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(59, 130, 246, 0.4));
+  }
+}
+
+@keyframes titleTransformToJarvis {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
 @keyframes matrix-rain {
   0% {
     transform: translateY(-100%);
@@ -206,13 +742,4 @@
   background-size: 150px 100px;
   animation: float 20s linear infinite;
   pointer-events: none;
-}
-
-@keyframes float {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(-150px, -100px);
-  }
 }
