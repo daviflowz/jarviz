@@ -134,7 +134,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       
       <div 
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto scrollbar-hide relative z-10"
+        className="flex-1 overflow-y-auto scrollbar-hide relative z-10 px-2 sm:px-4 md:px-8"
       >
         {messages.length === 0 ? (
           <EmptyState 
@@ -144,7 +144,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
             nextScreen={nextScreen}
           />
         ) : (
-          <div className="max-w-4xl mx-auto p-4 space-y-4">
+          <div className="w-full max-w-2xl mx-auto p-2 sm:p-4 space-y-4">
             {messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
@@ -193,13 +193,13 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       
       {/* Sugestões de perguntas - posicionadas acima do input */}
       {messages.length === 0 && (
-        <div className="px-4 pb-2">
-          <div className="flex gap-2 sm:gap-3 justify-center">
+        <div className="px-2 sm:px-4 pb-2">
+          <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
             {currentSuggestions.map((suggestion, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestedMessage(suggestion)}
-                className="w-48 h-8 sm:w-56 sm:h-10 px-2 text-xs bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/20 hover:border-cyan-400/40 rounded-md text-cyan-300/80 hover:text-cyan-200 transition-all duration-300 backdrop-blur-sm hover:scale-105 flex items-center justify-center"
+                className="w-40 h-8 sm:w-56 sm:h-10 px-2 text-xs sm:text-sm bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/20 hover:border-cyan-400/40 rounded-md text-cyan-300/80 hover:text-cyan-200 transition-all duration-300 backdrop-blur-sm hover:scale-105 flex items-center justify-center"
                 title={suggestion}
               >
                 <div className="text-center leading-tight truncate" title={suggestion}>

@@ -24,7 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   };
 
   const getLogoClasses = () => {
-    const baseClasses = "w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto jarvis-glow backdrop-blur-sm border border-cyan-400/30 cursor-pointer transition-all duration-200 hover:scale-105 hover:from-cyan-500/30 hover:to-blue-600/30 hover:border-cyan-300/50";
+    const baseClasses = "w-36 h-36 sm:w-56 sm:h-56 md:w-64 md:h-64 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto jarvis-glow backdrop-blur-sm border border-cyan-400/30 cursor-pointer transition-all duration-200 hover:scale-105 hover:from-cyan-500/30 hover:to-blue-600/30 hover:border-cyan-300/50";
     
     if (isTransitioning && nextScreen === 'jarvis') {
       return `${baseClasses} animate-logo-smooth-transition`;
@@ -34,7 +34,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   };
 
   const getTitleClasses = () => {
-    const baseClasses = "text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold hologram-text text-gradient leading-none tracking-wider";
+    const baseClasses = "text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-bold hologram-text text-gradient leading-none tracking-wider";
     
     if (isTransitioning && nextScreen === 'jarvis') {
       return `${baseClasses} animate-title-smooth-transition`;
@@ -44,18 +44,18 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center p-4 relative overflow-hidden">
+    <div className="flex flex-col items-center p-2 sm:p-4 relative overflow-hidden">
       {/* Efeito de grade tecnológica de fundo */}
       <div className="absolute inset-0 tech-grid opacity-10" />
       
       
       
       {/* Container principal centralizado */}
-              <div className="text-center relative z-10 flex flex-col items-center w-full max-w-sm sm:max-w-md md:max-w-lg pt-16 sm:pt-20">
+              <div className="text-center relative z-10 flex flex-col items-center w-full max-w-xs sm:max-w-md md:max-w-lg pt-8 sm:pt-16">
         
         {/* Frase explicativa */}
         <div className="mb-8 text-center">
-          <p className="text-cyan-300/80 text-sm sm:text-base font-medium leading-relaxed max-w-sm mx-auto">
+          <p className="text-cyan-300/80 text-xs sm:text-base font-medium leading-relaxed max-w-xs sm:max-w-sm mx-auto">
             Clique na logo abaixo para uma experiência imersiva de conversa contínua!
           </p>
         </div>
@@ -68,8 +68,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             title="Clique para acessar o sistema J.A.R.V.I.S"
           >
             <Bot 
-              size={90} 
-              className="text-cyan-400 sm:w-28 sm:h-28 md:w-32 md:h-32" 
+              size={56} 
+              className="text-cyan-400 sm:w-20 sm:h-20 md:w-28 md:h-28" 
             />
           </div>
           

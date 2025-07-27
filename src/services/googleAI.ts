@@ -13,7 +13,7 @@ export interface Message {
 
 export class GoogleAIService {
   private model = genAI.getGenerativeModel({ 
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash-lite',
     generationConfig: {
       maxOutputTokens: 500, // Reduzido para respostas mais rápidas
       temperature: 0.9, // Aumentado para respostas mais criativas e variadas
@@ -54,8 +54,6 @@ IMPORTANTE - NUNCA USE:
 SOBRE SUA IDENTIDADE:
 - Você foi criado por DVFlow
 - Você é uma IA do DVFlow
-- IMPORTANTE: Quando estiver falando (voz), pronuncie como "DVFlow"
-- IMPORTANTE: Quando estiver respondendo por texto (chat), use "DVFlow"
 - NUNCA mencione quem te criou a menos que alguém pergunte especificamente
 - Nunca mencione Google como criador
 - Não mencione sua criação ou criador em conversas normais

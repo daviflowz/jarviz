@@ -76,15 +76,15 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   }, []);
   
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 animate-slide-up`}>
-      <div className={`flex items-start gap-3 max-w-xs lg:max-w-md ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 sm:mb-6 animate-slide-up px-1`}>
+      <div className={`flex items-start gap-2 sm:gap-3 max-w-full sm:max-w-xs md:max-w-md ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         {/* Avatar */}
-      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+      <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
         isUser 
             ? 'bg-gradient-to-br from-cyan-600 to-blue-600 text-white' 
             : 'glass-effect border border-cyan-500/30 text-cyan-400'
       }`}>
-        {isUser ? <User size={18} /> : <Bot size={18} />}
+        {isUser ? <User size={16} className="sm:w-5 sm:h-5" /> : <Bot size={16} className="sm:w-5 sm:h-5" />}
       </div>
       
         {/* Mensagem */}
@@ -94,7 +94,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             ? 'chat-bubble-user' 
             : 'chat-bubble-ai'
           }`}>
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">
               {message.content}
             </p>
             
@@ -103,7 +103,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               <button
                 onClick={() => handleSpeak(message.content)}
                 disabled={isLoading}
-                className={`mt-3 p-2 rounded-full transition-all duration-300 ${
+                className={`mt-2 sm:mt-3 p-2 rounded-full transition-all duration-300 ${
                   isLoading 
                     ? 'bg-cyan-500/30 text-cyan-300 cursor-not-allowed' 
                     : isPlaying 
@@ -113,18 +113,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                 title={isLoading ? "Carregando..." : isPlaying ? "Parar áudio" : "Ouvir mensagem"}
               >
                 {isLoading ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={14} className="animate-spin" />
                 ) : isPlaying ? (
-                  <PauseCircle size={16} />
+                  <PauseCircle size={14} />
                 ) : (
-                  <Volume2 size={16} />
+                  <Volume2 size={14} />
                 )}
               </button>
             )}
         </div>
         
           {/* Timestamp */}
-          <div className={`text-xs text-cyan-400/60 mt-1 ${
+          <div className={`text-[10px] sm:text-xs text-cyan-400/60 mt-1 ${
             isUser ? 'text-right' : 'text-left'
           }`}>
           {message.timestamp.toLocaleTimeString('pt-BR', { 
