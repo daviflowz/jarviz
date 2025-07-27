@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Bot, ArrowLeft } from 'lucide-react';
 import { googleAIService } from '../services/googleAI';
 
@@ -23,7 +23,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
   const activeAudiosRef = useRef<HTMLAudioElement[]>([]);
   
   // Array de saudações variadas
-  const greetings = [
+  const greetings = useMemo(() => [
     "Oi! Como posso te ajudar hoje?",
     "Olá! Estou aqui para conversar com você.",
     "Oi! Que bom te ver por aqui!",
@@ -34,7 +34,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
     "Olá! Como posso te auxiliar hoje?",
     "Oi! Estou aqui e pronto para conversar!",
     "Olá! Em que posso te ajudar?"
-  ];
+  ], []);
   
   const recognitionRef = useRef<any>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
