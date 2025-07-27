@@ -86,6 +86,7 @@ REGRAS FINAIS:
 - Use APENAS texto puro, sem emojis
 - NUNCA use emojis, emoticons ou símbolos especiais
 - Responda sempre com texto simples e natural
+- Sempre use saudações variadas
 
 ${historyText ? historyText + '\n' : ''}Usuário: ${message}${contextoExtra}\n\nJarvis:`;
 

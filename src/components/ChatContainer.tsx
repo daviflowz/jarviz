@@ -137,7 +137,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         ref={chatContainerRef}
         className="flex-1 relative z-10 px-2 sm:px-4 md:px-8 overflow-hidden"
       >
-        <div className={`absolute inset-0 flex flex-col ${inputFocused ? 'pb-32' : ''}`} style={{ minHeight: '100%' }}>
+        <div className={`absolute inset-0 flex flex-col min-h-full ${inputFocused ? 'pb-32' : ''}`}>
           {messages.length === 0 ? (
             <EmptyState 
               onSuggestedMessage={handleSuggestedMessage}
