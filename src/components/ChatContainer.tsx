@@ -53,7 +53,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [inputFocused, setInputFocused] = useState(false);
 
   // Mudar sugestões apenas quando a página carrega
   useEffect(() => {
@@ -123,17 +122,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     handleSendMessage(message);
   };
 
-  // Função para scroll automático ao focar no input
-  const handleInputFocusScroll = () => {
-    setTimeout(() => {
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      } else if (chatContainerRef.current) {
-        chatContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }
-    }, 100);
-  };
-
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 relative overflow-hidden">
       {/* Efeito de grade tecnológica de fundo */}
@@ -187,7 +175,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         <ChatInput 
           onSendMessage={handleSendMessage}
           isLoading={isLoading}
-          onInputFocusChange={setInputFocused}
           onInputFocusScroll={() => {
             setTimeout(() => {
               if (messagesEndRef.current) {
