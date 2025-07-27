@@ -93,6 +93,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
           <span>Sistema Online</span>
         </div>
+        
+
       </div>
     </div>
   );

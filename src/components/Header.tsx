@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, messageCount }) => 
             J A R V I S
           </h1>
           <p className="text-xs text-cyan-400/80">
-            Advanced AI Assistant (BETA)
+          (beta)-DɅVY Flow 
           </p>
         </div>
         

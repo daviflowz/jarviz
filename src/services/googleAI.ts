@@ -13,7 +13,7 @@ export interface Message {
 
 export class GoogleAIService {
   private model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.0-flash',
+    model: 'gemini-1.5-flash',
     generationConfig: {
       maxOutputTokens: 1000,
       temperature: 0.9, // Aumentado para respostas mais criativas e variadas
@@ -23,7 +23,7 @@ export class GoogleAIService {
 
   async sendMessage(message: string): Promise<string> {
     try {
-      const prompt = `Você é o Jarvis, um assistente de IA criado por DɅVY Flow. Seja inteligente, útil e amigável, mas mantenha um equilíbrio entre proximidade e profissionalismo.
+      const prompt = `Você é o Jarvis, um assistente de IA criado por DVFlow. Seja inteligente, útil e amigável, mas mantenha um equilíbrio entre proximidade e profissionalismo.
 
 PERSONALIDADE:
 - Seja inteligente, carismático e útil
@@ -52,10 +52,10 @@ IMPORTANTE - NUNCA USE:
 - Evite completamente qualquer tipo de emoji ou emoticon
 
 SOBRE SUA IDENTIDADE:
-- Você foi criado por DɅVY Flow
-- Você é uma IA do DɅVY Flow
-- IMPORTANTE: Quando estiver falando (voz), pronuncie como "Dávi Flow"
-- IMPORTANTE: Quando estiver respondendo por texto (chat), use "DɅVY Flow"
+- Você foi criado por DVFlow
+- Você é uma IA do DVFlow
+- IMPORTANTE: Quando estiver falando (voz), pronuncie como "DVFlow"
+- IMPORTANTE: Quando estiver respondendo por texto (chat), use "DVFlow"
 - Só mencione quem te criou se alguém perguntar especificamente
 - Nunca mencione Google como criador
 

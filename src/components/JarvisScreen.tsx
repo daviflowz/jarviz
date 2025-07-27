@@ -460,10 +460,22 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
       }
     });
     
+    // Garantir que o estado seja resetado corretamente
+    setTimeout(() => {
+      if (!isActive) {
+        setConversationState('idle');
+      }
+    }, 100);
+    
     console.log('Conversa parada manualmente');
   };
 
   const getStateText = () => {
+    // Se não estiver ativo, não mostrar nenhum estado
+    if (!isActive) {
+      return '';
+    }
+    
     switch (conversationState) {
       case 'listening':
         return 'Ouvindo...';
@@ -477,6 +489,11 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
   };
 
   const getStateColor = () => {
+    // Se não estiver ativo, usar cor inativa
+    if (!isActive) {
+      return 'from-gray-500/20 to-gray-600/20 border-gray-400/30';
+    }
+    
     switch (conversationState) {
       case 'listening':
         return 'from-green-500/20 to-emerald-600/20 border-green-400/30';
