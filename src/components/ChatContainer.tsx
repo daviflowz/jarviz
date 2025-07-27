@@ -124,7 +124,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 relative overflow-hidden">
+    <div className={`flex flex-col h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 relative overflow-hidden ${inputFocused ? 'pb-32' : ''}`}>
       {/* Efeito de grade tecnológica de fundo */}
       <div className="absolute inset-0 tech-grid opacity-20" />
       
@@ -135,7 +135,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       
       <div 
         ref={chatContainerRef}
-        className={`flex-1 overflow-y-auto scrollbar-hide relative z-10 px-2 sm:px-4 md:px-8 ${inputFocused ? 'pb-32' : ''}`}
+        className="flex-1 overflow-y-auto scrollbar-hide relative z-10 px-2 sm:px-4 md:px-8"
       >
         {messages.length === 0 ? (
           <EmptyState 
