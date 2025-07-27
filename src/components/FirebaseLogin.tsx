@@ -15,10 +15,6 @@ export const FirebaseLogin: React.FC = () => {
     await signInWithPopup(auth, provider);
   };
 
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
-
   if (user) {
     return null; // Quando logado, não mostra a tela de login
   }
