@@ -17,6 +17,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
+    "string-similarity": "^4.0.4",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
@@ -59,6 +60,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@svgr/plugin-svgo": "^8.1.0",
     "@svgr/webpack": "^8.1.0",
+    "@types/string-similarity": "^4.0.2",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.4.3"

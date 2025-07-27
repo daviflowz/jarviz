@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import stringSimilarity from 'string-similarity';
 
 const API_KEY = 'AIzaSyDjunWvcLsfzl5ZFrLVcZh7YGC22DyHm4E';
 
@@ -23,12 +24,26 @@ export class GoogleAIService {
 
   async sendMessage(message: string): Promise<string> {
     try {
-      // Montar histórico das últimas 20 interações
-      const lastHistory = this.chatHistory.slice(-20);
+      // Função para detectar mudança de tópico
+      const isNewTopic = () => {
+        const userMessages = this.chatHistory.filter(m => m.role === 'user');
+        const lastUserMessages = userMessages.slice(-3).map(m => m.content);
+        if (lastUserMessages.length === 0) return false;
+        const similarity = lastUserMessages
+          .map(m => stringSimilarity.compareTwoStrings(m.toLowerCase(), message.toLowerCase()))
+          .reduce((a, b) => a + b, 0) / lastUserMessages.length;
+        return similarity < 0.25; // Threshold ajustável
+      };
+
+      const novoTopico = isNewTopic();
+      // Se novo tópico, usar só as últimas 2 interações, senão as últimas 20
+      const lastHistory = novoTopico ? this.chatHistory.slice(-2) : this.chatHistory.slice(-20);
       const historyText = lastHistory.map(msg => {
         const role = msg.role === 'user' ? 'Usuário' : 'Jarvis';
         return `${role}: ${msg.content}`;
       }).join('\n');
+
+      const contextoExtra = novoTopico ? '\n[O usuário mudou de assunto. Adapte sua resposta ao novo tópico e ignore o contexto anterior.]' : '';
 
       const prompt = `Você é o Jarvis, um assistente de IA criado por DVFlow. Seja inteligente, útil e amigável, mas mantenha um equilíbrio entre proximidade e profissionalismo.
 
@@ -72,7 +87,7 @@ REGRAS FINAIS:
 - NUNCA use emojis, emoticons ou símbolos especiais
 - Responda sempre com texto simples e natural
 
-${historyText ? historyText + '\n' : ''}Usuário: ${message}\n\nJarvis:`;
+${historyText ? historyText + '\n' : ''}Usuário: ${message}${contextoExtra}\n\nJarvis:`;
 
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
