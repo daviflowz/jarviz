@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebaseConfig";
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, User } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, User } from "firebase/auth";
 import { Bot } from "lucide-react";
 
 export const FirebaseLogin: React.FC = () => {
@@ -11,9 +11,18 @@ export const FirebaseLogin: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  const isMobile = () => {
+    if (typeof navigator === 'undefined') return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    if (isMobile()) {
+      await signInWithRedirect(auth, provider);
+    } else {
+      await signInWithPopup(auth, provider);
+    }
   };
 
   if (user) {
