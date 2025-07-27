@@ -34,11 +34,6 @@ export const FirebaseLogin: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const isMobile = () => {
-    if (typeof navigator === 'undefined') return false;
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  };
-
   const handleLogin = async () => {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
