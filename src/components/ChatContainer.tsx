@@ -124,7 +124,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   };
 
   return (
-    <div className={`flex flex-col h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 relative overflow-hidden ${inputFocused ? 'pb-32' : ''}`}>
+    <div className="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 relative overflow-hidden">
       {/* Efeito de grade tecnológica de fundo */}
       <div className="absolute inset-0 tech-grid opacity-20" />
       
@@ -135,45 +135,45 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       
       <div 
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto scrollbar-hide relative z-10 px-2 sm:px-4 md:px-8"
+        className="flex-1 relative z-10 px-2 sm:px-4 md:px-8 overflow-hidden"
       >
-        {messages.length === 0 ? (
-          <EmptyState 
-            onSuggestedMessage={handleSuggestedMessage}
-            onNavigateToJarvis={onNavigateToJarvis}
-            isTransitioning={isTransitioning}
-            nextScreen={nextScreen}
-          />
-        ) : (
-          <div className="w-full max-w-2xl mx-auto p-2 sm:p-4 space-y-4">
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            
-            {/* Indicador de carregamento */}
-            {isLoading && (
-              <div className="flex items-start gap-3 mb-6 animate-slide-up">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center glass-effect border border-cyan-500/30">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" />
-                </div>
-                <div className="flex flex-col items-start max-w-xs sm:max-w-sm md:max-w-md">
-                  <div className="chat-bubble-ai">
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className={`absolute inset-0 flex flex-col ${inputFocused ? 'pb-32' : ''}`} style={{ minHeight: '100%' }}>
+          {messages.length === 0 ? (
+            <EmptyState 
+              onSuggestedMessage={handleSuggestedMessage}
+              onNavigateToJarvis={onNavigateToJarvis}
+              isTransitioning={isTransitioning}
+              nextScreen={nextScreen}
+            />
+          ) : (
+            <div className="w-full max-w-2xl mx-auto p-2 sm:p-4 space-y-4 flex-1 overflow-y-auto scrollbar-hide">
+              {messages.map((message) => (
+                <ChatMessage key={message.id} message={message} />
+              ))}
+              {/* Indicador de carregamento */}
+              {isLoading && (
+                <div className="flex items-start gap-3 mb-6 animate-slide-up">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center glass-effect border border-cyan-500/30">
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" />
+                  </div>
+                  <div className="flex flex-col items-start max-w-xs sm:max-w-sm md:max-w-md">
+                    <div className="chat-bubble-ai">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <span className="text-xs text-cyan-400/80">Processando...</span>
                       </div>
-                      <span className="text-xs text-cyan-400/80">Processando...</span>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-        )}
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mensagem de erro */}
