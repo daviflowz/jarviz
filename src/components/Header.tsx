@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, onLogout, messageCo
         {/* Conteúdo centralizado */}
         <div className="text-center">
           <h1 className="text-base sm:text-xl font-bold hologram-text text-gradient">
-            J A R V I S
+            J A R V I X
           </h1>
           <p className="text-[10px] sm:text-xs text-cyan-400/80">
           (beta)-DɅVY Flow 
