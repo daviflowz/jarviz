@@ -137,14 +137,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       {/* Efeito de grade tecnológica de fundo */}
       <div className="absolute inset-0 tech-grid opacity-20" />
       
-      <div className="sticky top-0 z-50">
-        <Header 
-          onClearChat={handleClearChat}
-          onLogout={handleLogout}
-          messageCount={messages.length}
-        />
-      </div>
+      {/* Header fixo */}
+      <Header 
+        onClearChat={handleClearChat}
+        onLogout={handleLogout}
+        messageCount={messages.length}
+      />
       
+      {/* Container do conteúdo com scroll */}
       <div className="flex flex-col flex-1 relative z-10 px-2 sm:px-4 md:px-8 overflow-hidden">
         <div className="flex-1 overflow-y-auto scrollbar-hide w-full max-w-2xl mx-auto p-2 sm:p-4 space-y-4" ref={chatContainerRef}>
           {messages.length === 0 ? (

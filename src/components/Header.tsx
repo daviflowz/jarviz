@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, onLogout, messageCo
   };
 
   return (
-    <header className="sticky top-0 z-50 glass-effect border-b border-cyan-500/30 px-2 sm:px-4 py-2 sm:py-3">
+    <header className="sticky top-0 z-50 glass-effect border-b border-cyan-500/30 px-2 sm:px-4 py-2 sm:py-3 bg-gray-900/95 backdrop-blur-sm">
       <div className="flex items-center justify-between max-w-full sm:max-w-4xl mx-auto">
         {/* Ícone do robô na extrema esquerda */}
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center border border-cyan-400/30">
