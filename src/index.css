@@ -743,3 +743,61 @@
   animation: float 20s linear infinite;
   pointer-events: none;
 }
+
+/* Animações suaves para transição */
+.animate-logo-smooth-transition {
+  animation: logoSmoothTransition 0.6s ease-in-out;
+}
+
+.animate-title-smooth-transition {
+  animation: titleSmoothTransition 0.6s ease-in-out;
+}
+
+.animate-status-smooth-transition {
+  animation: statusSmoothTransition 0.6s ease-in-out;
+}
+
+@keyframes logoSmoothTransition {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes titleSmoothTransition {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes statusSmoothTransition {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.95);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}

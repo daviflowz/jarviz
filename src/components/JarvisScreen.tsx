@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Bot, ArrowLeft } from 'lucide-react';
 import { googleAIService } from '../services/googleAI';
 
@@ -40,7 +40,14 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const listeningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const startListeningTimeout = () => {
+  const clearListeningTimeout = useCallback(() => {
+    if (listeningTimeoutRef.current) {
+      clearTimeout(listeningTimeoutRef.current);
+      listeningTimeoutRef.current = null;
+    }
+  }, []);
+
+  const startListeningTimeout = useCallback(() => {
     // Limpar timeout anterior se existir
     if (listeningTimeoutRef.current) {
       clearTimeout(listeningTimeoutRef.current);
@@ -51,20 +58,47 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
       if (isActive && conversationState === 'listening') {
         console.log('Timeout: Nenhuma voz detectada em 10 segundos, encerrando conversa');
         
-        // Usar a mesma função de parada completa
-        stopContinuousConversation();
+        // Parar diretamente aqui em vez de chamar a função
+        setIsActive(false);
+        setConversationState('idle');
+        
+        // Parar reconhecimento de voz
+        if (recognitionRef.current) {
+          try {
+            recognitionRef.current.stop();
+            recognitionRef.current.abort();
+          } catch (error) {
+            console.error('Erro ao parar reconhecimento:', error);
+          }
+        }
+        
+        // Parar síntese de voz IMEDIATAMENTE
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+          window.speechSynthesis.cancel();
+        }
+        
+        // Limpar timeouts
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+        clearListeningTimeout();
+        
+        // Parar TODOS os áudios ativos controlados pelo sistema
+        activeAudiosRef.current.forEach(audio => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.src = '';
+        });
+        activeAudiosRef.current = [];
         
         console.log('Sistema completamente parado por timeout');
       }
     }, 10000);
-  };
-
-  const clearListeningTimeout = () => {
-    if (listeningTimeoutRef.current) {
-      clearTimeout(listeningTimeoutRef.current);
-      listeningTimeoutRef.current = null;
-    }
-  };
+  }, [isActive, conversationState, clearListeningTimeout]);
 
   // Carregar vozes disponíveis
   useEffect(() => {
@@ -124,7 +158,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
                       if (isActive) {
                         setConversationState('listening');
                       }
-                    }, 300);
+                    }, 200); // Reduzido de 300ms para 200ms
                   }
                 };
                 
@@ -145,10 +179,10 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
                 }
               });
           }
-        }, 1000);
-      }, 1000);
+        }, 500); // Reduzido de 1000ms para 500ms
+      }, 500); // Reduzido de 1000ms para 500ms
     }
-  }, [hasInitialized]);
+  }, [hasInitialized, greetings, isActive]);
 
   // Inicializar Speech Recognition
   useEffect(() => {
@@ -197,7 +231,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
                       if (isActive) {
                         setConversationState('listening');
                       }
-                    }, 300); // Reduzido de 800ms para 300ms
+                    }, 150); // Reduzido de 300ms para 150ms
                   }
                 };
                 
@@ -292,7 +326,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
       
       try {
         // Processar mensagem e TTS em paralelo para máxima velocidade
-        const [aiResponse, _] = await Promise.all([
+        const [aiResponse] = await Promise.all([
           googleAIService.sendMessage(userMessage),
           // Preload: começar a preparar o TTS service (conexão)
           fetch('https://tts-service-850542229344.southamerica-east1.run.app/tts', {
@@ -347,14 +381,14 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
         
         // Tentar novamente mais rapidamente em caso de erro
         if (isActive && conversationState === 'listening') {
-          setTimeout(() => startListening(), 500); // Reduzido de 1000ms
+          setTimeout(() => startListening(), 200); // Reduzido de 500ms para 200ms
         }
       };
 
       recognition.onend = () => {
         // Só reiniciar se estiver ativo E no estado listening
         if (isActive && conversationState === 'listening') {
-          setTimeout(() => startListening(), 200);
+          setTimeout(() => startListening(), 100); // Reduzido de 200ms para 100ms
         } else {
           // Limpar timeout se não for reiniciar
           clearListeningTimeout();
@@ -366,7 +400,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
 
     // Iniciar listening apenas quando o estado mudar para 'listening'
     if (conversationState === 'listening' && isActive) {
-      const timer = setTimeout(() => startListening(), 200);
+      const timer = setTimeout(() => startListening(), 100); // Reduzido de 200ms para 100ms
       return () => clearTimeout(timer);
     }
 

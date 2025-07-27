@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -24,33 +24,36 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   };
 
   const getLogoClasses = () => {
-    const baseClasses = "w-56 h-56 sm:w-60 sm:h-60 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto jarvis-glow backdrop-blur-sm border border-cyan-400/30 cursor-pointer transition-all duration-200 hover:scale-105 hover:from-cyan-500/30 hover:to-blue-600/30 hover:border-cyan-300/50";
+    const baseClasses = "w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto jarvis-glow backdrop-blur-sm border border-cyan-400/30 cursor-pointer transition-all duration-200 hover:scale-105 hover:from-cyan-500/30 hover:to-blue-600/30 hover:border-cyan-300/50";
     
     if (isTransitioning && nextScreen === 'jarvis') {
-      return `${baseClasses} animate-logo-transform-to-jarvis`;
+      return `${baseClasses} animate-logo-smooth-transition`;
     }
     
     return `${baseClasses} ${isAnimating ? 'scale-110' : ''}`;
   };
 
   const getTitleClasses = () => {
-    const baseClasses = "text-4xl sm:text-5xl md:text-6xl font-bold hologram-text text-gradient mb-8 sm:mb-12 leading-none";
+    const baseClasses = "text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold hologram-text text-gradient leading-none tracking-wider";
     
     if (isTransitioning && nextScreen === 'jarvis') {
-      return `${baseClasses} animate-title-transform-to-jarvis`;
+      return `${baseClasses} animate-title-smooth-transition`;
     }
     
     return baseClasses;
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden min-h-screen">
+    <div className="flex flex-col items-center p-4 relative overflow-hidden">
       {/* Efeito de grade tecnológica de fundo */}
       <div className="absolute inset-0 tech-grid opacity-10" />
       
-      <div className="text-center relative z-10 flex flex-col items-center justify-center w-full max-w-sm sm:max-w-md md:max-w-lg">
+      
+      
+      {/* Container principal centralizado */}
+              <div className="text-center relative z-10 flex flex-col items-center w-full max-w-sm sm:max-w-md md:max-w-lg pt-16 sm:pt-20">
         
-        {/* Frase explicativa para experiência imersiva */}
+        {/* Frase explicativa */}
         <div className="mb-8 text-center">
           <p className="text-cyan-300/80 text-sm sm:text-base font-medium leading-relaxed max-w-sm mx-auto">
             Clique na logo abaixo para uma experiência imersiva de conversa contínua!
@@ -58,15 +61,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         </div>
         
         {/* Logo principal */}
-        <div className="relative mb-8">
+        <div className="relative mb-6 sm:mb-8">
           <div 
             className={getLogoClasses()}
             onClick={handleLogoClick}
             title="Clique para acessar o sistema J.A.R.V.I.S"
           >
             <Bot 
-              size={100} 
-              className="text-cyan-400 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36" 
+              size={90} 
+              className="text-cyan-400 sm:w-28 sm:h-28 md:w-32 md:h-32" 
             />
           </div>
           
@@ -83,18 +86,18 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           </div>
         </div>
         
-        {/* Título centralizado */}
-        <h1 className={getTitleClasses()}>
-          J.A.R.V.I.S
-        </h1>
+        {/* Título principal */}
+        <div className="mb-4 sm:mb-6">
+          <h1 className={getTitleClasses()}>
+            J.A.R.V.I.S
+          </h1>
+        </div>
         
-        {/* Indicador sutil */}
-        <div className="flex items-center gap-2 text-xs text-cyan-400/50">
+        {/* Status da conversa */}
+        <div className={`flex items-center gap-2 text-xs text-cyan-400/50 ${isTransitioning && nextScreen === 'jarvis' ? 'animate-status-smooth-transition' : ''}`}>
           <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
           <span>Sistema Online</span>
         </div>
-        
-
       </div>
     </div>
   );

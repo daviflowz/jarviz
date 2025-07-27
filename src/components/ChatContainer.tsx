@@ -6,6 +6,36 @@ import { EmptyState } from './EmptyState';
 import { googleAIService, Message } from '../services/googleAI';
 import { AlertTriangle } from 'lucide-react';
 
+// Array de sugestões de perguntas
+const allSuggestions = [
+  "Por que o céu é azul?",
+  "Como funciona a memória?",
+  "O que é um buraco negro?",
+  "Por que sonhamos?",
+  "Como funciona a gravidade?",
+  "O que é a inteligência?",
+  "Por que o mar é salgado?",
+  "Como funciona o tempo?",
+  "O que é a consciência?",
+  "Por que as folhas são verdes?",
+  "Como funciona a música?",
+  "O que é o amor?",
+  "Por que envelhecemos?",
+  "Como funciona a luz?",
+  "O que é a felicidade?",
+  "Por que as estrelas brilham?",
+  "Como funciona a dor?",
+  "O que é a beleza?",
+  "Por que rimos?",
+  "Como funciona a vida?"
+];
+
+// Função para selecionar 2 sugestões aleatórias
+const getRandomSuggestions = () => {
+  const shuffled = [...allSuggestions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, 2);
+};
+
 interface ChatContainerProps {
   onNavigateToJarvis: () => void;
   isTransitioning?: boolean;
@@ -20,8 +50,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Mudar sugestões apenas quando a página carrega
+  useEffect(() => {
+    setCurrentSuggestions(getRandomSuggestions());
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -151,6 +187,26 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
             >
               ×
             </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Sugestões de perguntas - posicionadas acima do input */}
+      {messages.length === 0 && (
+        <div className="px-4 pb-2">
+          <div className="flex gap-2 sm:gap-3 justify-center">
+            {currentSuggestions.map((suggestion, index) => (
+              <button
+                key={index}
+                onClick={() => handleSuggestedMessage(suggestion)}
+                className="w-48 h-8 sm:w-56 sm:h-10 px-2 text-xs bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/20 hover:border-cyan-400/40 rounded-md text-cyan-300/80 hover:text-cyan-200 transition-all duration-300 backdrop-blur-sm hover:scale-105 flex items-center justify-center"
+                title={suggestion}
+              >
+                <div className="text-center leading-tight truncate" title={suggestion}>
+                  {suggestion}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       )}

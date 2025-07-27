@@ -15,7 +15,7 @@ export class GoogleAIService {
   private model = genAI.getGenerativeModel({ 
     model: 'gemini-1.5-flash',
     generationConfig: {
-      maxOutputTokens: 1000,
+      maxOutputTokens: 500, // Reduzido para respostas mais rápidas
       temperature: 0.9, // Aumentado para respostas mais criativas e variadas
     }
   });
@@ -56,8 +56,9 @@ SOBRE SUA IDENTIDADE:
 - Você é uma IA do DVFlow
 - IMPORTANTE: Quando estiver falando (voz), pronuncie como "DVFlow"
 - IMPORTANTE: Quando estiver respondendo por texto (chat), use "DVFlow"
-- Só mencione quem te criou se alguém perguntar especificamente
+- NUNCA mencione quem te criou a menos que alguém pergunte especificamente
 - Nunca mencione Google como criador
+- Não mencione sua criação ou criador em conversas normais
 
 Seja útil, inteligente e amigável, mantendo o equilíbrio entre proximidade e profissionalismo. 
 
@@ -111,7 +112,7 @@ Jarvis:`;
         body: JSON.stringify({ 
           text,
           voice: 'pt-BR-Neural2-B', // Voz mais rápida
-          speed: 1.1 // Velocidade ligeiramente aumentada
+          speed: 1.3 // Velocidade aumentada para fala mais rápida
         })
       });
 
