@@ -139,16 +139,15 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       {/* Efeito de grade tecnológica de fundo */}
       <div className="absolute inset-0 tech-grid opacity-20" />
       
-      <Header 
-        onClearChat={handleClearChat}
-        messageCount={messages.length}
-      />
+      <div className="sticky top-0 z-50">
+        <Header 
+          onClearChat={handleClearChat}
+          messageCount={messages.length}
+        />
+      </div>
       
-      <div 
-        ref={chatContainerRef}
-        className="flex-1 relative z-10 px-2 sm:px-4 md:px-8 overflow-hidden"
-      >
-        <div className={`absolute inset-0 flex flex-col min-h-full ${inputFocused ? 'pb-32' : ''}`}>
+      <div className="flex flex-col flex-1 relative z-10 px-2 sm:px-4 md:px-8 overflow-hidden">
+        <div className="flex-1 overflow-y-auto scrollbar-hide w-full max-w-2xl mx-auto p-2 sm:p-4 space-y-4" ref={chatContainerRef}>
           {messages.length === 0 ? (
             <EmptyState 
               onSuggestedMessage={handleSuggestedMessage}
@@ -157,7 +156,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
               nextScreen={nextScreen}
             />
           ) : (
-            <div className="w-full max-w-2xl mx-auto p-2 sm:p-4 space-y-4 flex-1 overflow-y-auto scrollbar-hide">
+            <>
               {messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
@@ -182,9 +181,23 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
                 </div>
               )}
               <div ref={messagesEndRef} />
-            </div>
+            </>
           )}
         </div>
+        <ChatInput 
+          onSendMessage={handleSendMessage}
+          isLoading={isLoading}
+          onInputFocusChange={setInputFocused}
+          onInputFocusScroll={() => {
+            setTimeout(() => {
+              if (messagesEndRef.current) {
+                messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+              } else if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+              }
+            }, 100);
+          }}
+        />
       </div>
 
       {/* Mensagem de erro */}
@@ -223,12 +236,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         </div>
       )}
       
-      <ChatInput 
-        onSendMessage={handleSendMessage}
-        isLoading={isLoading}
-        onInputFocusChange={setInputFocused}
-        onInputFocusScroll={handleInputFocusScroll}
-      />
     </div>
   );
 };
