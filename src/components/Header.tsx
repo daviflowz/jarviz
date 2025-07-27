@@ -1,12 +1,24 @@
-import React from 'react';
-import { Trash2, Settings, Bot } from 'lucide-react';
+import React, { useState } from 'react';
+import { Trash2, Settings, Bot, LogOut } from 'lucide-react';
 
 interface HeaderProps {
   onClearChat: () => void;
+  onLogout: () => void;
   messageCount: number;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onClearChat, messageCount }) => {
+export const Header: React.FC<HeaderProps> = ({ onClearChat, onLogout, messageCount }) => {
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+
+  const handleSettingsClick = () => {
+    setShowSettingsMenu(!showSettingsMenu);
+  };
+
+  const handleLogout = () => {
+    setShowSettingsMenu(false);
+    onLogout();
+  };
+
   return (
     <header className="sticky top-0 z-50 glass-effect border-b border-cyan-500/30 px-2 sm:px-4 py-2 sm:py-3">
       <div className="flex items-center justify-between max-w-full sm:max-w-4xl mx-auto">
@@ -37,16 +49,40 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, messageCount }) => 
               <Trash2 size={16} />
             </button>
           ) : (
-            // Quando não há mensagens: mostrar engrenagem
-            <button
-              className="p-2 text-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 border border-transparent hover:border-cyan-500/30"
-              title="Configurações"
-            >
-              <Settings size={16} />
-            </button>
+            // Quando não há mensagens: mostrar engrenagem com menu dropdown
+            <div className="relative">
+              <button
+                onClick={handleSettingsClick}
+                className="p-2 text-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 border border-transparent hover:border-cyan-500/30"
+                title="Configurações"
+              >
+                <Settings size={16} />
+              </button>
+              
+              {/* Menu dropdown */}
+              {showSettingsMenu && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg shadow-lg z-50">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-cyan-200 hover:bg-cyan-500/20 transition-all duration-200 rounded-lg"
+                  >
+                    <LogOut size={16} />
+                    <span className="text-sm font-medium">Sair</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
+      
+      {/* Overlay para fechar menu quando clicar fora */}
+      {showSettingsMenu && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setShowSettingsMenu(false)}
+        />
+      )}
     </header>
   );
 };

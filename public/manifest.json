@@ -1,33 +1,15 @@
 {
-  "short_name": "J.A.R.V.I.S",
-  "name": "J.A.R.V.I.S - Advanced AI Assistant",
-  "description": "Sistema inteligente de conversação por voz e texto com tecnologia de ponta",
+  "short_name": "Jarvis",
+  "name": "Jarvis AI Assistant",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "maskable any"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#06b6d4",
-  "background_color": "#0f172a",
-  "categories": ["productivity", "utilities", "social"],
-  "lang": "pt-BR",
-  "scope": "/",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"]
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }

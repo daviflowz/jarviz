@@ -5,6 +5,8 @@ import { Header } from './Header';
 import { EmptyState } from './EmptyState';
 import { googleAIService, Message } from '../services/googleAI';
 import { AlertTriangle } from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
 
 // Array de sugestões de perguntas
 const allSuggestions = [
@@ -122,6 +124,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     handleSendMessage(message);
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 relative overflow-hidden">
       {/* Efeito de grade tecnológica de fundo */}
@@ -130,6 +140,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       <div className="sticky top-0 z-50">
         <Header 
           onClearChat={handleClearChat}
+          onLogout={handleLogout}
           messageCount={messages.length}
         />
       </div>
