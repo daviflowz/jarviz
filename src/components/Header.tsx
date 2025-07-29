@@ -18,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, onLogout, messageCo
     setShowSettingsMenu(false);
     onLogout();
   };
+  
 
   return (
     <header className="sticky top-0 z-50 glass-effect border-b border-cyan-500/30 px-2 sm:px-4 py-2 sm:py-3 bg-gray-900/95 backdrop-blur-sm">

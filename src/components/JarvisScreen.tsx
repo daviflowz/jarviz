@@ -18,6 +18,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
   const [conversationState, setConversationState] = useState<ConversationState>('idle');
   const [isActive, setIsActive] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   
   // Referência para controlar todos os áudios ativos
   const activeAudiosRef = useRef<HTMLAudioElement[]>([]);
@@ -329,16 +330,25 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
         // Limpar timeout em caso de erro
         clearListeningTimeout();
         
-        // Tentar novamente mais rapidamente em caso de erro
+        // Se o erro for de permissão negada, parar completamente
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          console.log('Permissão de microfone negada - parando reconhecimento');
+          setPermissionDenied(true);
+          setIsActive(false);
+          setConversationState('idle');
+          return;
+        }
+        
+        // Tentar novamente apenas para outros tipos de erro
         if (isActive && conversationState === 'listening') {
-          setTimeout(() => startListening(), 200); // Reduzido de 500ms para 200ms
+          setTimeout(() => startListening(), 200);
         }
       };
 
       recognition.onend = () => {
         // Só reiniciar se estiver ativo E no estado listening
         if (isActive && conversationState === 'listening') {
-          setTimeout(() => startListening(), 100); // Reduzido de 200ms para 100ms
+          setTimeout(() => startListening(), 100);
         } else {
           // Limpar timeout se não for reiniciar
           clearListeningTimeout();
@@ -348,9 +358,9 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
       recognitionRef.current = recognition;
     }
 
-    // Iniciar listening apenas quando o estado mudar para 'listening'
-    if (conversationState === 'listening' && isActive) {
-      const timer = setTimeout(() => startListening(), 100); // Reduzido de 200ms para 100ms
+    // Iniciar listening apenas quando o estado mudar para 'listening' E permissão não foi negada
+    if (conversationState === 'listening' && isActive && !permissionDenied) {
+      const timer = setTimeout(() => startListening(), 100);
       return () => clearTimeout(timer);
     }
 
@@ -361,9 +371,11 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
       }
       clearListeningTimeout(); // Limpar timeout de ouvir
     };
-  }, [isActive, conversationState, startListeningTimeout, clearListeningTimeout]);
+  }, [isActive, conversationState, permissionDenied, startListeningTimeout, clearListeningTimeout]);
 
   const startContinuousConversation = () => {
+    // Resetar permissão negada quando tentar iniciar novamente
+    setPermissionDenied(false);
     setIsActive(true);
     
     // Definir estado como listening - o useEffect vai cuidar do resto
@@ -455,6 +467,11 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
   };
 
   const getStateText = () => {
+    // Se permissão foi negada, mostrar mensagem específica
+    if (permissionDenied) {
+      return 'Microfone negado';
+    }
+    
     // Se não estiver ativo, não mostrar nenhum estado
     if (!isActive) {
       return '';
@@ -473,6 +490,11 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
   };
 
   const getStateColor = () => {
+    // Se permissão foi negada, usar cor vermelha
+    if (permissionDenied) {
+      return 'from-red-500/20 to-red-600/20 border-red-400/30';
+    }
+    
     // Se não estiver ativo, usar cor inativa
     if (!isActive) {
       return 'from-gray-500/20 to-gray-600/20 border-gray-400/30';

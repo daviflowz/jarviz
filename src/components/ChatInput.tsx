@@ -82,8 +82,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, 
   };
 
   return (
-    <div className="fixed bottom-0 left-0 w-full z-40 glass-effect border-t border-cyan-500/30 p-2 sm:p-4 bg-slate-900/95 backdrop-blur-md" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+    <div className="fixed bottom-0 left-0 w-full z-40 glass-effect border-t border-cyan-500/30 p-3 sm:p-4 md:p-6 bg-slate-900/95 backdrop-blur-md" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-2 sm:px-4 md:px-6">
         <div className="flex items-center gap-2 sm:gap-3 relative">
           {/* Botão do microfone - agora no lado esquerdo */}
           <button

@@ -56,8 +56,18 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Mudar sugestões apenas quando a página carrega
+  // Carregar histórico do usuário e mudar sugestões quando a página carrega
   useEffect(() => {
+    const loadUserHistory = async () => {
+      try {
+        const history = await googleAIService.loadUserHistory();
+        setMessages(history);
+      } catch (error) {
+        console.error('Erro ao carregar histórico:', error);
+      }
+    };
+
+    loadUserHistory();
     setCurrentSuggestions(getRandomSuggestions());
   }, []);
 
@@ -114,10 +124,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     }
   };
 
-  const handleClearChat = () => {
+  const handleClearChat = async () => {
     setMessages([]);
     setError(null);
-    googleAIService.clearHistory();
+    await googleAIService.clearHistory();
   };
 
   const handleSuggestedMessage = (message: string) => {
@@ -145,7 +155,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       />
       
       {/* Container do conteúdo com scroll */}
-      <div className="flex flex-col flex-1 relative z-10 px-2 sm:px-4 md:px-8 overflow-hidden">
+      <div className="flex flex-col flex-1 relative z-10 px-2 sm:px-4 md:px-8 overflow-hidden pb-20 sm:pb-24 md:pb-28">
         <div className="flex-1 overflow-y-auto scrollbar-hide w-full max-w-2xl mx-auto p-2 sm:p-4 space-y-4" ref={chatContainerRef}>
           {messages.length === 0 ? (
             <EmptyState 
@@ -216,7 +226,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       
       {/* Sugestões de perguntas - posicionadas acima do input */}
       {messages.length === 0 && (
-        <div className="px-2 sm:px-4 pb-2">
+        <div className="px-2 sm:px-4 pb-4 sm:pb-6">
           <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
             {currentSuggestions.map((suggestion, index) => (
               <button
