@@ -89,29 +89,48 @@ class GoogleAIService {
     }
   }
 
+  // Helper para log de erro
+  private logError(context: string, error: unknown): void {
+    console.error(`❌ ${context}:`, error);
+    console.error('🔍 Detalhes do erro:', {
+      code: (error as any)?.code,
+      message: (error as any)?.message,
+      stack: (error as any)?.stack
+    });
+  }
+
   // Salvar mensagem no Firestore
   async saveMessageToFirestore(message: Message): Promise<void> {
-    if (!this.userId) return;
+    if (!this.userId) {
+      console.log('❌ saveMessageToFirestore: userId não definido');
+      return;
+    }
 
     try {
+      console.log('📝 Salvando mensagem no Firestore:', message.content.substring(0, 50) + '...');
       const messageData = {
         ...message,
         timestamp: serverTimestamp(),
         userId: this.userId
       };
 
-      await addDoc(collection(db, 'messages'), messageData);
-      console.log('Mensagem salva no Firestore');
+      console.log('📊 Dados da mensagem:', messageData);
+      const docRef = await addDoc(collection(db, 'messages'), messageData);
+      console.log('✅ Mensagem salva no Firestore com ID:', docRef.id);
     } catch (error) {
-      console.error('Erro ao salvar mensagem:', error);
+      this.logError('Erro ao salvar mensagem no Firestore', error);
     }
   }
 
   // Salvar entidade de contexto no Firestore
   async saveContextEntity(key: string, value: string): Promise<void> {
-    if (!this.userId) return;
+    if (!this.userId) {
+      console.log('❌ saveContextEntity: userId não definido');
+      return;
+    }
 
     try {
+      console.log('🏷️ Salvando entidade de contexto:', key, '=', value);
       const entityData = {
         key,
         value,
@@ -125,25 +144,32 @@ class GoogleAIService {
       const entityDoc = await getDoc(entityRef);
 
       if (entityDoc.exists()) {
+        console.log('🔄 Atualizando entidade existente:', key);
         // Atualizar contador e data
         await updateDoc(entityRef, {
           mentionCount: entityDoc.data().mentionCount + 1,
           lastMentioned: serverTimestamp()
         });
       } else {
+        console.log('🆕 Criando nova entidade:', key);
         // Criar nova entidade
         await setDoc(entityRef, entityData);
       }
+      console.log('✅ Entidade salva com sucesso:', key);
     } catch (error) {
-      console.error('Erro ao salvar entidade de contexto:', error);
+      this.logError('Erro ao salvar entidade de contexto', error);
     }
   }
 
   // Carregar histórico do usuário do Firestore
   async loadUserHistory(): Promise<Message[]> {
-    if (!this.userId) return [];
+    if (!this.userId) {
+      console.log('❌ loadUserHistory: userId não definido');
+      return [];
+    }
 
     try {
+      console.log('📚 Carregando histórico do usuário:', this.userId);
       const messagesQuery = query(
         collection(db, 'messages'),
         where('userId', '==', this.userId),
@@ -151,7 +177,10 @@ class GoogleAIService {
         limit(50) // Últimas 50 mensagens
       );
 
+      console.log('🔍 Executando query do Firestore...');
       const querySnapshot = await getDocs(messagesQuery);
+      console.log('📊 Query executada, documentos encontrados:', querySnapshot.size);
+      
       const messages: Message[] = [];
 
       querySnapshot.forEach((doc) => {
@@ -168,19 +197,23 @@ class GoogleAIService {
       messages.reverse();
       this.chatHistory = messages;
       
-      console.log('Histórico carregado:', messages.length, 'mensagens');
+      console.log('✅ Histórico carregado:', messages.length, 'mensagens');
       return messages;
     } catch (error) {
-      console.error('Erro ao carregar histórico:', error);
+      this.logError('Erro ao carregar histórico', error);
       return [];
     }
   }
 
   // Carregar entidades de contexto do Firestore
   async loadContextEntities(): Promise<void> {
-    if (!this.userId) return;
+    if (!this.userId) {
+      console.log('❌ loadContextEntities: userId não definido');
+      return;
+    }
 
     try {
+      console.log('🏷️ Carregando entidades de contexto para usuário:', this.userId);
       const entitiesQuery = query(
         collection(db, 'contextEntities'),
         where('userId', '==', this.userId),
@@ -188,7 +221,10 @@ class GoogleAIService {
         limit(20) // Últimas 20 entidades
       );
 
+      console.log('🔍 Executando query de entidades...');
       const querySnapshot = await getDocs(entitiesQuery);
+      console.log('📊 Entidades encontradas:', querySnapshot.size);
+      
       this.contextEntities.clear();
 
       querySnapshot.forEach((doc) => {
@@ -196,9 +232,9 @@ class GoogleAIService {
         this.contextEntities.set(data.key, data.value);
       });
 
-      console.log('Entidades de contexto carregadas:', this.contextEntities.size);
+      console.log('✅ Entidades de contexto carregadas:', this.contextEntities.size);
     } catch (error) {
-      console.error('Erro ao carregar entidades de contexto:', error);
+      this.logError('Erro ao carregar entidades de contexto', error);
     }
   }
 
