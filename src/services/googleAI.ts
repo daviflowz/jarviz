@@ -8,10 +8,6 @@ import {
   getDoc, 
   collection, 
   addDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
   getDocs,
   deleteDoc,
   updateDoc,
@@ -77,26 +73,39 @@ class GoogleAIService {
     this.isInitialized = true; // Marcar como inicializado primeiro
     
     try {
-      console.log('Carregando histórico do usuário...');
+      console.log('🚀 Inicializando serviço para usuário:', userId);
+      
+      console.log('📚 Carregando histórico do usuário...');
       await this.loadUserHistory();
-      console.log('Carregando entidades de contexto...');
+      console.log('🏷️ Carregando entidades de contexto...');
       await this.loadContextEntities();
-      console.log('Serviço inicializado para usuário:', userId);
+      console.log('✅ Serviço inicializado com sucesso para usuário:', userId);
     } catch (error) {
-      console.error('Erro ao carregar dados do Firestore:', error);
+      console.error('❌ Erro ao carregar dados do Firestore:', error);
       // Mesmo com erro, o serviço está inicializado
-      console.log('Serviço inicializado (modo offline):', userId);
+      console.log('⚠️ Serviço inicializado (modo offline):', userId);
     }
   }
 
   // Helper para log de erro
   private logError(context: string, error: unknown): void {
     console.error(`❌ ${context}:`, error);
-    console.error('🔍 Detalhes do erro:', {
-      code: (error as any)?.code,
-      message: (error as any)?.message,
-      stack: (error as any)?.stack
-    });
+    
+    // Log detalhado do erro
+    if (error instanceof Error) {
+      console.error('🔍 Detalhes do erro:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    } else if (typeof error === 'object' && error !== null) {
+      console.error('🔍 Detalhes do erro:', {
+        code: (error as any)?.code,
+        message: (error as any)?.message,
+        details: (error as any)?.details,
+        status: (error as any)?.status
+      });
+    }
   }
 
   // Salvar mensagem no Firestore
@@ -115,10 +124,19 @@ class GoogleAIService {
       };
 
       console.log('📊 Dados da mensagem:', messageData);
-      const docRef = await addDoc(collection(db, 'messages'), messageData);
+      
+      // Adicionar timeout para evitar travamentos
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout ao salvar no Firestore')), 10000)
+      );
+      
+      const savePromise = addDoc(collection(db, 'messages'), messageData);
+      const docRef = await Promise.race([savePromise, timeoutPromise]) as any;
+      
       console.log('✅ Mensagem salva no Firestore com ID:', docRef.id);
     } catch (error) {
       this.logError('Erro ao salvar mensagem no Firestore', error);
+      console.log('⚠️ Continuando sem salvar no Firestore');
     }
   }
 
@@ -170,37 +188,46 @@ class GoogleAIService {
 
     try {
       console.log('📚 Carregando histórico do usuário:', this.userId);
-      const messagesQuery = query(
-        collection(db, 'messages'),
-        where('userId', '==', this.userId),
-        orderBy('timestamp', 'desc'),
-        limit(50) // Últimas 50 mensagens
+      
+      // Adicionar timeout para evitar travamentos
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout ao carregar histórico')), 15000)
       );
-
-      console.log('🔍 Executando query do Firestore...');
-      const querySnapshot = await getDocs(messagesQuery);
+      
+      // Usar getDocs diretamente sem query complexa para evitar listeners
+      const messagesRef = collection(db, 'messages');
+      const querySnapshot = await Promise.race([
+        getDocs(messagesRef),
+        timeoutPromise
+      ]) as any;
+      
       console.log('📊 Query executada, documentos encontrados:', querySnapshot.size);
       
       const messages: Message[] = [];
 
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach((doc: any) => {
         const data = doc.data();
-        messages.push({
-          id: doc.id,
-          role: data.role,
-          content: data.content,
-          timestamp: data.timestamp?.toDate() || new Date()
-        });
+        // Filtrar apenas mensagens do usuário atual
+        if (data.userId === this.userId) {
+          messages.push({
+            id: doc.id,
+            role: data.role,
+            content: data.content,
+            timestamp: data.timestamp?.toDate() || new Date()
+          });
+        }
       });
 
-      // Ordenar por timestamp (mais antigas primeiro)
-      messages.reverse();
-      this.chatHistory = messages;
+      // Ordenar por timestamp (mais antigas primeiro) e limitar a 50
+      messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      const limitedMessages = messages.slice(-50);
+      this.chatHistory = limitedMessages;
       
-      console.log('✅ Histórico carregado:', messages.length, 'mensagens');
-      return messages;
+      console.log('✅ Histórico carregado:', limitedMessages.length, 'mensagens');
+      return limitedMessages;
     } catch (error) {
       this.logError('Erro ao carregar histórico', error);
+      console.log('⚠️ Continuando sem histórico do Firestore');
       return [];
     }
   }
@@ -214,22 +241,20 @@ class GoogleAIService {
 
     try {
       console.log('🏷️ Carregando entidades de contexto para usuário:', this.userId);
-      const entitiesQuery = query(
-        collection(db, 'contextEntities'),
-        where('userId', '==', this.userId),
-        orderBy('lastMentioned', 'desc'),
-        limit(20) // Últimas 20 entidades
-      );
-
-      console.log('🔍 Executando query de entidades...');
-      const querySnapshot = await getDocs(entitiesQuery);
+      
+      // Usar getDocs diretamente sem query complexa para evitar listeners
+      const entitiesRef = collection(db, 'contextEntities');
+      const querySnapshot = await getDocs(entitiesRef);
       console.log('📊 Entidades encontradas:', querySnapshot.size);
       
       this.contextEntities.clear();
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        this.contextEntities.set(data.key, data.value);
+        // Filtrar apenas entidades do usuário atual
+        if (data.userId === this.userId) {
+          this.contextEntities.set(data.key, data.value);
+        }
       });
 
       console.log('✅ Entidades de contexto carregadas:', this.contextEntities.size);
@@ -244,30 +269,28 @@ class GoogleAIService {
 
     try {
       // Limpar mensagens do Firestore
-      const messagesQuery = query(
-        collection(db, 'messages'),
-        where('userId', '==', this.userId)
-      );
-
-      const messagesSnapshot = await getDocs(messagesQuery);
-      const deletePromises = messagesSnapshot.docs.map(doc => deleteDoc(doc.ref));
+      const messagesRef = collection(db, 'messages');
+      const messagesSnapshot = await getDocs(messagesRef);
+      
+      const deletePromises = messagesSnapshot.docs
+        .filter(doc => doc.data().userId === this.userId)
+        .map(doc => deleteDoc(doc.ref));
       await Promise.all(deletePromises);
 
       // Limpar entidades de contexto do Firestore
-      const entitiesQuery = query(
-        collection(db, 'contextEntities'),
-        where('userId', '==', this.userId)
-      );
-
-      const entitiesSnapshot = await getDocs(entitiesQuery);
-      const deleteEntityPromises = entitiesSnapshot.docs.map(doc => deleteDoc(doc.ref));
+      const entitiesRef = collection(db, 'contextEntities');
+      const entitiesSnapshot = await getDocs(entitiesRef);
+      
+      const deleteEntityPromises = entitiesSnapshot.docs
+        .filter(doc => doc.data().userId === this.userId)
+        .map(doc => deleteDoc(doc.ref));
       await Promise.all(deleteEntityPromises);
 
       // Limpar memória
       this.chatHistory = [];
       this.contextEntities.clear();
 
-      console.log('Histórico limpo completamente');
+      console.log('✅ Histórico do usuário limpo');
     } catch (error) {
       console.error('Erro ao limpar histórico:', error);
     }
@@ -281,20 +304,20 @@ class GoogleAIService {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const usageQuery = query(
-        collection(db, 'usage'),
-        where('userId', '==', this.userId),
-        where('date', '>=', today)
-      );
-
-      const usageSnapshot = await getDocs(usageQuery);
+      // Usar getDocs diretamente sem query complexa para evitar listeners
+      const usageRef = collection(db, 'usage');
+      const usageSnapshot = await getDocs(usageRef);
+      
       let dailyRequests = 0;
       let monthlyTokens = 0;
 
       usageSnapshot.forEach((doc) => {
         const data = doc.data();
-        dailyRequests += data.requests || 0;
-        monthlyTokens += data.tokens || 0;
+        // Filtrar apenas dados do usuário atual e de hoje
+        if (data.userId === this.userId && data.date && data.date.toDate() >= today) {
+          dailyRequests += data.requests || 0;
+          monthlyTokens += data.tokens || 0;
+        }
       });
 
       if (dailyRequests >= USER_LIMITS.dailyRequests) {
@@ -962,20 +985,20 @@ Responda como um assistente de IA de última geração, com precisão e conhecim
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const usageQuery = query(
-        collection(db, 'usage'),
-        where('userId', '==', this.userId),
-        where('date', '>=', today)
-      );
-
-      const usageSnapshot = await getDocs(usageQuery);
+      // Usar getDocs diretamente sem query complexa para evitar listeners
+      const usageRef = collection(db, 'usage');
+      const usageSnapshot = await getDocs(usageRef);
+      
       let dailyRequests = 0;
       let monthlyTokens = 0;
 
       usageSnapshot.forEach((doc) => {
         const data = doc.data();
-        dailyRequests += data.requests || 0;
-        monthlyTokens += data.tokens || 0;
+        // Filtrar apenas dados do usuário atual e de hoje
+        if (data.userId === this.userId && data.date && data.date.toDate() >= today) {
+          dailyRequests += data.requests || 0;
+          monthlyTokens += data.tokens || 0;
+        }
       });
 
       return {

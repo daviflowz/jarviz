@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { Trash2, Settings, Bot, LogOut } from 'lucide-react';
+import { Trash2, Settings, Bot, LogOut, History, ArrowLeft } from 'lucide-react';
 
 interface HeaderProps {
   onClearChat: () => void;
   onLogout: () => void;
+  onShowHistory: () => void;
+  onGoBack?: () => void;
   messageCount: number;
+  showBackButton?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onClearChat, onLogout, messageCount }) => {
+export const Header: React.FC<HeaderProps> = ({ 
+  onClearChat, 
+  onLogout, 
+  onShowHistory, 
+  onGoBack, 
+  messageCount,
+  showBackButton = false 
+}) => {
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
   const handleSettingsClick = () => {
@@ -18,14 +28,35 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, onLogout, messageCo
     setShowSettingsMenu(false);
     onLogout();
   };
+
+  const handleShowHistory = () => {
+    setShowSettingsMenu(false);
+    onShowHistory();
+  };
+
+  const handleGoBack = () => {
+    if (onGoBack) {
+      onGoBack();
+    }
+  };
   
 
   return (
     <header className="sticky top-0 z-50 glass-effect border-b border-cyan-500/30 px-2 sm:px-4 py-2 sm:py-3 bg-gray-900/95 backdrop-blur-sm">
       <div className="flex items-center justify-between max-w-full sm:max-w-4xl mx-auto">
-        {/* Ícone do robô na extrema esquerda */}
+        {/* Botão de voltar ou ícone do robô na extrema esquerda */}
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center border border-cyan-400/30">
-          <Bot size={18} className="text-cyan-400" />
+          {showBackButton ? (
+            <button
+              onClick={handleGoBack}
+              className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200"
+              title="Voltar"
+            >
+              <ArrowLeft size={18} />
+            </button>
+          ) : (
+            <Bot size={18} className="text-cyan-400" />
+          )}
         </div>
         
         {/* Conteúdo centralizado */}
@@ -63,6 +94,13 @@ export const Header: React.FC<HeaderProps> = ({ onClearChat, onLogout, messageCo
               {/* Menu dropdown */}
               {showSettingsMenu && (
                 <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg shadow-lg z-50">
+                  <button
+                    onClick={handleShowHistory}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-cyan-200 hover:bg-cyan-500/20 transition-all duration-200 rounded-lg"
+                  >
+                    <History size={16} />
+                    <span className="text-sm font-medium">Histórico</span>
+                  </button>
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 text-cyan-200 hover:bg-cyan-500/20 transition-all duration-200 rounded-lg"

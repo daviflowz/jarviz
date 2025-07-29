@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCBNtW8gMngS7RpWZeGv0DrWoaCwY_Moig",
@@ -14,4 +14,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app); 
+export const db = getFirestore(app);
+
+// Habilitar logs detalhados do Firestore para debug
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔧 Configuração do Firebase carregada:', {
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain
+  });
+} 

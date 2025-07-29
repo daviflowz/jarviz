@@ -3,6 +3,7 @@ import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { Header } from './Header';
 import { EmptyState } from './EmptyState';
+import { ChatHistory } from './ChatHistory';
 import { googleAIService, Message } from '../services/googleAI';
 import { AlertTriangle } from 'lucide-react';
 import { signOut } from 'firebase/auth';
@@ -40,12 +41,14 @@ const getRandomSuggestions = () => {
 
 interface ChatContainerProps {
   onNavigateToJarvis: () => void;
+  onNavigateToWelcome: () => void;
   isTransitioning?: boolean;
   nextScreen?: 'chat' | 'jarvis' | null;
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({ 
   onNavigateToJarvis, 
+  onNavigateToWelcome,
   isTransitioning = false, 
   nextScreen = null 
 }) => {
@@ -53,6 +56,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [allHistoryMessages, setAllHistoryMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +67,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       try {
         const history = await googleAIService.loadUserHistory();
         setMessages(history);
+        setAllHistoryMessages(history);
       } catch (error) {
         console.error('Erro ao carregar histórico:', error);
       }
@@ -107,6 +113,9 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      
+      // Atualizar histórico completo
+      setAllHistoryMessages(prev => [...prev, userMessage, aiMessage]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
       
@@ -130,6 +139,15 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     await googleAIService.clearHistory();
   };
 
+  const handleShowHistory = () => {
+    setShowHistory(true);
+  };
+
+  const handleLoadConversation = (conversationMessages: Message[]) => {
+    setMessages(conversationMessages);
+    setError(null);
+  };
+
   const handleSuggestedMessage = (message: string) => {
     handleSendMessage(message);
   };
@@ -151,7 +169,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       <Header 
         onClearChat={handleClearChat}
         onLogout={handleLogout}
+        onShowHistory={handleShowHistory}
+        onGoBack={onNavigateToWelcome}
         messageCount={messages.length}
+        showBackButton={messages.length > 0}
       />
       
       {/* Container do conteúdo com scroll */}
@@ -242,6 +263,15 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Modal de histórico */}
+      {showHistory && (
+        <ChatHistory
+          messages={allHistoryMessages}
+          onClose={() => setShowHistory(false)}
+          onLoadConversation={handleLoadConversation}
+        />
       )}
       
     </div>

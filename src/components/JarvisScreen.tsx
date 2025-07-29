@@ -4,6 +4,7 @@ import { googleAIService } from '../services/googleAI';
 
 interface JarvisScreenProps {
   onNavigateToChat: () => void;
+  onNavigateToWelcome: () => void;
   isTransitioning?: boolean;
   nextScreen?: 'chat' | 'jarvis' | null;
 }
@@ -12,6 +13,7 @@ type ConversationState = 'idle' | 'listening' | 'processing' | 'speaking';
 
 export const JarvisScreen: React.FC<JarvisScreenProps> = ({ 
   onNavigateToChat, 
+  onNavigateToWelcome, 
   isTransitioning = false, 
   nextScreen = null 
 }) => {
@@ -531,7 +533,7 @@ export const JarvisScreen: React.FC<JarvisScreenProps> = ({
         audio.src = '';
       });
       
-      onNavigateToChat();
+      onNavigateToWelcome();
     }, 200);
   };
 
